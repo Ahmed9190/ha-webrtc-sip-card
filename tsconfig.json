@@ -6,8 +6,8 @@
       "DOM",
       "DOM.Iterable"
     ],
-    "module": "ESNext",
-    "moduleResolution": "node16",
+    "module": "ES2020",
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
@@ -15,7 +15,10 @@
     "allowJs": true,
     "outDir": "./dist",
     "declaration": true,
-    "noEmit": true,
+    "declarationMap": true,
+    "declarationDir": "./dist/types",
+    "noEmit": false,
+    "emitDeclarationOnly": true,
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
@@ -27,8 +30,10 @@
     ]
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "vite.config.ts"
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
   ]
 }

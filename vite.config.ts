@@ -1,5 +1,4 @@
 import { defineConfig } from "vite";
-import { resolve } from "path";
 
 export default defineConfig({
   build: {
@@ -12,7 +11,7 @@ export default defineConfig({
       formats: ["es"],
       fileName: (format, entryName) => `${entryName}.js`,
     },
-    outDir: "./dist",
+    outDir: "dist",
     emptyOutDir: true,
     rollupOptions: {
       external: [],
@@ -20,9 +19,9 @@ export default defineConfig({
         // Ensure each entry is a separate file
         manualChunks: undefined,
         format: "esm",
-        entryFileNames: `[name].js`,
-        chunkFileNames: `[name].js`,
-        assetFileNames: `[name].[ext]`
+        entryFileNames: "[name].js",
+        chunkFileNames: "[name].js",
+        assetFileNames: "[name].[ext]"
       },
     },
     target: "es2017",
