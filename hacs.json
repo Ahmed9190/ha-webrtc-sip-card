@@ -2,11 +2,8 @@
   "name": "WebRTC SIP Card",
   "render_readme": true,
   "homeassistant": "2023.8.0",
-  "filename": "ha-webrtc-sip-card.js",
-  "content_in_root": false,
+  "filename": "card.js",
+  "content_in_root": true,
   "zip_release": true,
-  "hacs": "1.6.0",
-  "hide_default_branch": true,
-  "persistent_directory": false,
-  "render_readme_root": true
+  "hacs": "1.6.0"
 }
