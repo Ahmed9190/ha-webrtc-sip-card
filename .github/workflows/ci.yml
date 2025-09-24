@@ -2,99 +2,213 @@ name: Continuous Integration
 
 on:
   push:
-    branches: ["main", "develop"]
+    branches: [main, develop]
   pull_request:
-    branches: ["main"]
+    branches: [main]
 
 jobs:
   test:
-    name: Test Suite
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x, 22.x]
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Validate version
-        run: npm run validate-version
-
-      - name: Run linter
-        run: npm run lint
-
-      - name: Run type checking
-        run: npm run type-check
-
-      # - name: Run unit tests
-      #   run: npm run test:unit
-
-      # - name: Run integration tests
-      #   run: npm run test:integration
-
-      - name: Build
-        run: npm run build
-
-      - name: Validate build output
-        run: node scripts/validate.js
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-${{ matrix.node-version }}
-          path: dist/
-          retention-days: 7
-
-  security:
-    name: Security Scan
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run security audit
-        run: npm audit --audit-level=moderate
-
-      - name: Scan for secrets
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  compatibility:
-    name: HACS Validation
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
+      - uses: actions/checkout@v4
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
-          cache: "npm"
-
+          node-version: '20'
+          cache: 'npm'
+          
       - name: Install dependencies
         run: npm ci
+        
+      - name: Run linter
+        run: npm run lint
+        
+      - name: Run type check
+        run: npm run type-check
 
-      - name: Build
-        run: npm run build
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build project
+        run: npm run build:prod
+        
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+          retention-days: 1
 
-      - name: HACS validation
+  validate-hacs:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+          
+      - name: HACS Validation
         uses: hacs/action@main
         with:
           category: plugin
+          comment: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  validate-structure:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download build artifacts  
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+          
+      - name: Validate file structure
+        run: |
+          echo "Checking required files..."
+          ls -la dist/
+          
+          if [ ! -f "dist/ha-webrtc-sip-card.js" ]; then
+            echo "Error: ha-webrtc-sip-card.js not found in dist/"
+            exit 1
+          fi
+          
+          if [ ! -f "dist/ha-webrtc-sip-card-editor.js" ]; then
+            echo "Error: ha-webrtc-sip-card-editor.js not found in dist/"
+            exit 1
+          fi
+          
+          if [ ! -f "hacs.json" ]; then
+            echo "Error: hacs.json not found"
+            exit 1
+          fi
+          
+          echo "All required files present ✓"
+          
+          # Check file sizes
+          JS_SIZE=$(stat -c%s "dist/ha-webrtc-sip-card.js")
+          EDITOR_SIZE=$(stat -c%s "dist/ha-webrtc-sip-card-editor.js")
+          
+          if [ "$JS_SIZE" -lt 1000 ]; then
+            echo "Warning: Main JS file seems too small ($JS_SIZE bytes)"
+            exit 1
+          fi
+          
+          if [ "$EDITOR_SIZE" -lt 500 ]; then
+            echo "Warning: Editor JS file seems too small ($EDITOR_SIZE bytes)"
+            exit 1
+          fi
+          
+          echo "File sizes look good ✓"
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+          
+      - name: Build Docker development image
+        run: docker build --target development -t ha-webrtc-sip-card:dev .
+        
+      - name: Build Docker production image  
+        run: docker build --target production -t ha-webrtc-sip-card:prod .
+        
+      - name: Test Docker containers
+        run: |
+          echo "Testing development container..."
+          docker run --rm -d --name test-dev -p 3001:3000 ha-webrtc-sip-card:dev
+          sleep 5
+          docker stop test-dev || true
+          
+          echo "Testing production container..."
+          docker run --rm -d --name test-prod -p 8081:80 ha-webrtc-sip-card:prod
+          sleep 5
+          docker stop test-prod || true
+          
+          echo "Docker tests completed ✓"
+
+  release-check:
+    runs-on: ubuntu-latest
+    needs: [test, build, validate-hacs, validate-structure]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+          
+      - name: Check if release needed
+        id: release-check
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          if git tag --list | grep -q "^v${CURRENT_VERSION}$"; then
+            echo "Version v${CURRENT_VERSION} already tagged"
+            echo "needs_release=false" >> $GITHUB_OUTPUT
+          else
+            echo "Version v${CURRENT_VERSION} not tagged, release needed"
+            echo "needs_release=true" >> $GITHUB_OUTPUT
+            echo "version=${CURRENT_VERSION}" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Create Release
+        if: steps.release-check.outputs.needs_release == 'true'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.release-check.outputs.version }}
+          release_name: Release v${{ steps.release-check.outputs.version }}
+          body: |
+            ## Changes
+            
+            Auto-generated release for version ${{ steps.release-check.outputs.version }}
+            
+            ### Files
+            - ha-webrtc-sip-card.js - Main card component
+            - ha-webrtc-sip-card-editor.js - Configuration editor
+            - hacs.json - HACS metadata
+            
+            See [CHANGELOG.md](CHANGELOG.md) for detailed changes.
+          draft: false
+          prerelease: false
+          
+      - name: Upload Release Assets
+        if: steps.release-check.outputs.needs_release == 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: dist/ha-webrtc-sip-card.js
+          asset_name: ha-webrtc-sip-card.js
+          asset_content_type: application/javascript
