@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build
+      run: npm run build
+    
+    - name: Create ZIP for release
+      run: |
+        cd dist
+        zip -r ../ha-webrtc-sip-card-${{ github.ref_name }}.zip .
+        cd ..
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          ha-webrtc-sip-card-${{ github.ref_name }}.zip
+          dist/ha-webrtc-sip-card.js
+          dist/ha-webrtc-sip-card-editor.js
+        generate_release_notes: true
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Update HACS repository
+      uses: ludeeus/action-hacs@main
+      with:
+        category: "frontend"
+        version: ${{ github.ref_name }}
+        repository: ${{ github.repository }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

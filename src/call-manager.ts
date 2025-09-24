@@ -93,7 +93,7 @@ export class CallManager extends EventTarget {
   }
 
   private handleIncomingCall(event: CustomEvent): void {
-    const { from, displayName, callInfo } = event.detail;
+    const { from, displayName } = event.detail;
 
     const cleanedExtension = this.cleanExtension(from);
     const cleanedDisplayName = this.cleanDisplayName(displayName, cleanedExtension);

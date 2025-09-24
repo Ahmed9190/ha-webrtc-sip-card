@@ -3,13 +3,22 @@
   "version": "1.0.0",
   "description": "A modern WebRTC SIP client card for Home Assistant",
   "main": "dist/ha-webrtc-sip-card.js",
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port 3000",
     "build": "vite build",
+    "dev": "vite --host 0.0.0.0 --port 3000",
     "preview": "vite preview",
     "lint": "eslint src --ext .ts",
     "type-check": "tsc --noEmit",
-    "serve": "vite build && vite preview"
+    "serve": "vite build && vite preview",
+    "prepare": "npm run build",
+    "release": "npm version patch && git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ahmed9190/ha-webrtc-sip-card.git"
   },
   "keywords": [
     "home-assistant",
@@ -17,10 +26,17 @@
     "webrtc",
     "sip",
     "voip",
-    "hacs"
+    "hacs",
+    "webphone",
+    "video-call",
+    "phone"
   ],
   "author": "Ahmed Waleed",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ahmed9190/ha-webrtc-sip-card/issues"
+  },
+  "homepage": "https://github.com/Ahmed9190/ha-webrtc-sip-card#readme",
   "devDependencies": {
     "@types/node": "^24.5.2",
     "@typescript-eslint/eslint-plugin": "^6.21.0",

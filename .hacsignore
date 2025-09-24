@@ -1,0 +1,11 @@
+src/
+node_modules/
+.github/
+docs/
+examples/
+*.md
+tsconfig.json
+vite.config.ts
+package*.json
+.gitignore
+.eslintrc.js

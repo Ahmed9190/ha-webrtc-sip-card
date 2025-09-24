@@ -204,7 +204,7 @@ export class WebRTCSipCard extends LitElement {
       }
     });
 
-    this.sipManager.addEventListener("localVideoChanged", (event: any) => {
+    this.sipManager.addEventListener("localVideoChanged", (_event: any) => {
       this.callState = this.callManager?.getCallState() || this.callState;
       this.requestUpdate();
     });
@@ -1388,11 +1388,14 @@ declare global {
   }
 }
 
+// HACS Integration Information
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
   type: "ha-webrtc-sip-card",
   name: "WebRTC SIP Card",
-  description: "A modern WebRTC SIP client card for Home Assistant",
+  description: "A modern WebRTC SIP client card for Home Assistant with video calling functionality",
+  preview: true,
+  documentationURL: "https://github.com/Ahmed9190/ha-webrtc-sip-card",
   version: CARD_VERSION,
 });
 
@@ -1400,4 +1403,10 @@ console.info(
   `%c HA-WEBRTC-SIP-CARD %c ${CARD_VERSION} `,
   "color: white; background: #03a9f4; font-weight: bold;",
   "color: #03a9f4; background: white; font-weight: bold;"
+);
+
+// Add HACS banner
+console.info(
+  `%c 🏠 HACS Compatible`,
+  "color: white; background: #4285F4; font-weight: bold; padding: 5px 10px; border-radius: 5px;"
 );

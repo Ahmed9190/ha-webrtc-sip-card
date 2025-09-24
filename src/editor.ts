@@ -1,6 +1,6 @@
 import { LitElement, html, css, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import type { HomeAssistant, SIPCardConfig, SIPContact } from "./types";
+import type { HomeAssistant, SIPCardConfig } from "./types";
 import { DEFAULT_CONFIG } from "./constants";
 
 @customElement("ha-webrtc-sip-card-editor")
@@ -9,7 +9,6 @@ export class WebRTCSipCardEditor extends LitElement {
   @property({ attribute: false }) public lovelace?: any;
 
   @state() private _config!: SIPCardConfig;
-  @state() private _helpers?: any;
 
   public setConfig(config: SIPCardConfig): void {
     this._config = { ...DEFAULT_CONFIG, ...config };
@@ -112,7 +111,9 @@ export class WebRTCSipCardEditor extends LitElement {
     const value = target.type === "checkbox" ? target.checked : target.value;
     const configValue = target.configValue;
 
-    if (this[`_${configValue}`] === value) {
+    // Type assertion to prevent TypeScript error
+    const currentValue = (this as any)[`_${configValue}`];
+    if (currentValue === value) {
       return;
     }
 

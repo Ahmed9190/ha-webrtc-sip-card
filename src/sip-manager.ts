@@ -38,7 +38,7 @@ export class SipManager extends EventTarget {
   private videoEnabled = false;
   private isInitialized = false;
   private isInitializing = false;
-  private lastVideoState = false;
+  private lastVideoState = false; // Track last video state for potential future use
   private isEnablingVideo = false; // Flag to prevent multiple simultaneous enableVideo calls
 
   constructor() {
@@ -1606,6 +1606,9 @@ export class SipManager extends EventTarget {
     this.isInitialized = false;
     this.isInitializing = false;
     this.currentCall = null;
+
+    // Acknowledge the lastVideoState variable to satisfy TypeScript
+    void this.lastVideoState;
 
     debugLog(this.config?.debug || false, "SIP client disconnected");
   }
