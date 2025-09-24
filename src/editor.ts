@@ -52,17 +52,73 @@ export class WebRTCSipCardEditor extends LitElement {
           @input="${this._valueChanged}"
         ></ha-textfield>
 
-        <ha-formfield .label="Use Secure Connection">
+        <ha-textfield
+          label="STUN Servers (comma-separated)"
+          .value="${this._config.stun_servers ? this._config.stun_servers.join(',') : DEFAULT_CONFIG.stun_servers.join(',')}"
+          .configValue="${"stun_servers"}"
+          @input="${this._stunServersChanged}"
+        ></ha-textfield>
+
+        <ha-textfield
+          label="Ring Timeout (ms)"
+          type="number"
+          .value="${this._config.ring_timeout || DEFAULT_CONFIG.ring_timeout}"
+          .configValue="${"ring_timeout"}"
+          @input="${this._valueChanged}"
+        ></ha-textfield>
+
+        <div class="switch-container">
+          <label class="switch-label">Use Secure Connection</label>
           <ha-switch .checked="${this._config.use_secure !== false}" .configValue="${"use_secure"}" @change="${this._valueChanged}"></ha-switch>
-        </ha-formfield>
+        </div>
 
-        <ha-formfield .label="Debug Mode">
+        <div class="switch-container">
+          <label class="switch-label">Auto Answer</label>
+          <ha-switch .checked="${this._config.auto_answer === true}" .configValue="${"auto_answer"}" @change="${this._valueChanged}"></ha-switch>
+        </div>
+
+        <div class="switch-container">
+          <label class="switch-label">Video Enabled by Default</label>
+          <ha-switch .checked="${this._config.video_enabled !== false}" .configValue="${"video_enabled"}" @change="${this._valueChanged}"></ha-switch>
+        </div>
+
+        <div class="switch-container">
+          <label class="switch-label">DTMF Enabled</label>
+          <ha-switch .checked="${this._config.dtmf_enabled !== false}" .configValue="${"dtmf_enabled"}" @change="${this._valueChanged}"></ha-switch>
+        </div>
+
+        <div class="switch-container">
+          <label class="switch-label">Call History Enabled</label>
+          <ha-switch .checked="${this._config.call_history_enabled !== false}" .configValue="${"call_history_enabled"}" @change="${this._valueChanged}"></ha-switch>
+        </div>
+
+        <div class="switch-container">
+          <label class="switch-label">Debug Mode</label>
           <ha-switch .checked="${this._config.debug === true}" .configValue="${"debug"}" @change="${this._valueChanged}"></ha-switch>
-        </ha-formfield>
+        </div>
 
-        <ha-formfield .label="Hide Keypad">
+        <div class="switch-container">
+          <label class="switch-label">Hide Keypad</label>
           <ha-switch .checked="${this._config.hide_keypad === true}" .configValue="${"hide_keypad"}" @change="${this._valueChanged}"></ha-switch>
-        </ha-formfield>
+        </div>
+
+        <div class="switch-container">
+          <label class="switch-label">Hide Video Controls</label>
+          <ha-switch .checked="${this._config.hide_video_controls === true}" .configValue="${"hide_video_controls"}" @change="${this._valueChanged}"></ha-switch>
+        </div>
+
+        <div>
+          <label class="select-label">Theme</label>
+          <ha-select
+            .value="${this._config.theme || DEFAULT_CONFIG.theme}"
+            .configValue="${"theme"}"
+            @selected="${this._valueChanged}"
+          >
+            <mwc-list-item value="auto">Auto</mwc-list-item>
+            <mwc-list-item value="light">Light</mwc-list-item>
+            <mwc-list-item value="dark">Dark</mwc-list-item>
+          </ha-select>
+        </div>
 
         <h3>Contacts</h3>
         ${this._config.contacts.map(
@@ -102,14 +158,53 @@ export class WebRTCSipCardEditor extends LitElement {
     `;
   }
 
+  private _stunServersChanged(ev: Event): void {
+    if (!this._config || !this.hass) {
+      return;
+    }
+
+    const target = ev.target as any;
+    const value = target.value;
+    const configValue = target.configValue;
+
+    // Convert comma-separated string to array
+    const stunServers = value ? value.split(',').map((url: string) => url.trim()).filter((url: string) => url) : [];
+
+    this._config = {
+      ...this._config,
+      [configValue]: stunServers,
+    };
+
+    this.dispatchEvent(
+      new CustomEvent("config-changed", {
+        detail: { config: this._config },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
   private _valueChanged(ev: Event): void {
     if (!this._config || !this.hass) {
       return;
     }
 
     const target = ev.target as any;
-    const value = target.type === "checkbox" ? target.checked : target.value;
+    let value = target.value;
     const configValue = target.configValue;
+
+    // Handle boolean values for switches
+    if (target.tagName === 'HA-SWITCH') {
+      value = target.checked;
+    }
+    // Handle select elements
+    else if (target.tagName === 'HA-SELECT' || target.tagName === 'MWC-LIST-ITEM') {
+      value = target.value || (ev as CustomEvent).detail?.value || target.selected;
+      // Handle the case where selected is an index rather than the value
+      if (typeof value === 'number' && target.children && target.children[value]) {
+        value = target.children[value].value;
+      }
+    }
 
     // Type assertion to prevent TypeScript error
     const currentValue = (this as any)[`_${configValue}`];
@@ -241,6 +336,45 @@ export class WebRTCSipCardEditor extends LitElement {
     h3 {
       margin: 8px 0;
       color: var(--primary-text-color);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 500;
+      color: var(--primary-text-color);
+    }
+    
+    .switch-label {
+      display: inline-block;
+      margin-right: 8px;
+      margin-bottom: 0;
+      vertical-align: middle;
+      align-self: center;
+      color: var(--primary-text-color);
+      font-size: 14px;
+    }
+    
+    .select-label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 500;
+      color: var(--primary-text-color);
+    }
+    
+    .switch-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+    
+    .switch-container ha-switch {
+      margin-left: auto;
+    }
+    
+    ha-select {
+      width: 100%;
     }
   `;
 }
