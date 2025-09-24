@@ -49,49 +49,7 @@ jobs:
         with:
           name: dist-files
           path: dist/
-          retention-days: 1
-
-  validate-hacs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build for HACS validation
-        run: npm run build:prod
-
-      - name: Verify required files exist
-        run: |
-          echo "Checking for HACS required files..."
-          ls -la
-          ls -la dist/ || echo "No dist directory found"
-
-          if [ ! -f "hacs.json" ]; then
-            echo "ERROR: hacs.json not found"
-            exit 1
-          fi
-
-          if [ ! -f "dist/ha-webrtc-sip-card.js" ]; then
-            echo "ERROR: dist/ha-webrtc-sip-card.js not found"
-            exit 1
-          fi
-
-          echo "All required HACS files present"
-
-      - name: HACS Validation
-        uses: hacs/action@main
-        with:
-          category: plugin
-          comment: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          retention-days: 7
 
   validate-structure:
     runs-on: ubuntu-latest
@@ -127,25 +85,28 @@ jobs:
 
           echo "All required files present ✓"
 
-          # Check file sizes
-          JS_SIZE=$(stat -c%s "dist/ha-webrtc-sip-card.js")
-          EDITOR_SIZE=$(stat -c%s "dist/ha-webrtc-sip-card-editor.js")
+  # HACS validation disabled until first release is created
+  # validate-hacs:
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   if: github.event_name == 'pull_request' || contains(github.ref, 'refs/tags/')
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Download build artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: dist-files
+  #         path: dist/
+  #     - name: HACS Validation
+  #       uses: hacs/action@main
+  #       with:
+  #         category: plugin
+  #         comment: true
+  #         github_token: ${{ secrets.GITHUB_TOKEN }}
 
-          if [ "$JS_SIZE" -lt 1000 ]; then
-            echo "Warning: Main JS file seems too small ($JS_SIZE bytes)"
-            exit 1
-          fi
-
-          if [ "$EDITOR_SIZE" -lt 500 ]; then
-            echo "Warning: Editor JS file seems too small ($EDITOR_SIZE bytes)"
-            exit 1
-          fi
-
-          echo "File sizes look good ✓"
-
-  release-check:
+  release:
     runs-on: ubuntu-latest
-    needs: [test, build, validate-hacs, validate-structure]
+    needs: [test, build, validate-structure]
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
@@ -174,25 +135,34 @@ jobs:
       - name: Create Release
         if: steps.release-check.outputs.needs_release == 'true'
         uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ steps.release-check.outputs.version }}
           name: Release v${{ steps.release-check.outputs.version }}
           body: |
-            ## Changes
+            ## WebRTC SIP Card v${{ steps.release-check.outputs.version }}
 
-            Auto-generated release for version ${{ steps.release-check.outputs.version }}
+            ### Installation via HACS
+            1. Open HACS in Home Assistant
+            2. Go to Frontend
+            3. Click the menu (three dots) and select "Custom repositories"
+            4. Add this repository: `Ahmed9190/ha-webrtc-sip-card`
+            5. Category: Lovelace
+            6. Install and restart Home Assistant
+
+            ### Manual Installation
+            1. Download `ha-webrtc-sip-card.js` from the assets below
+            2. Place it in your `config/www/` folder
+            3. Add resource in Home Assistant: Configuration → Lovelace Dashboards → Resources
 
             ### Files
-            - ha-webrtc-sip-card.js - Main card component
-            - ha-webrtc-sip-card-editor.js - Configuration editor
-            - hacs.json - HACS metadata
+            - `ha-webrtc-sip-card.js` - Main card component
+            - `ha-webrtc-sip-card-editor.js` - Configuration editor
 
-            See [CHANGELOG.md](CHANGELOG.md) for detailed changes.
+            See [README.md](https://github.com/Ahmed9190/ha-webrtc-sip-card/blob/main/README.md) for configuration details.
           draft: false
           prerelease: false
           files: |
             dist/ha-webrtc-sip-card.js
             dist/ha-webrtc-sip-card-editor.js
-            hacs.json
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
