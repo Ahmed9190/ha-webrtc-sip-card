@@ -5,9 +5,11 @@ export default defineConfig({
   plugins: [],
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/card.ts'),
+      entry: {
+        card: resolve(__dirname, 'src/card.ts'),
+        editor: resolve(__dirname, 'src/editor.ts'),
+      },
       name: 'WebRTCSipCard',
-      fileName: (format) => `ha-webrtc-sip-card.${format}.js`,
     },
     rollupOptions: {
       output: {
