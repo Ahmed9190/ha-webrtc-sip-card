@@ -473,7 +473,9 @@ export class WebRTCSipCard extends LitElement {
         </div>
         <div class="card-title">${this.config.title || "WebRTC SIP Phone"}</div>
         ${!this.registered && !this.isRetrying
-          ? html` <ha-icon-button @click=${this.manualRetry} title="Retry connection"><ha-icon icon="mdi:refresh"></ha-icon></ha-icon-button> `
+          ? html`<ha-icon-button @click=${this.manualRetry} title="Retry connection">
+              <ha-icon icon="mdi:refresh"></ha-icon>
+            </ha-icon-button>`
           : ""}
       </div>
     `;
@@ -1406,7 +1408,4 @@ console.info(
 );
 
 // Add HACS banner
-console.info(
-  `%c 🏠 HACS Compatible`,
-  "color: white; background: #4285F4; font-weight: bold; padding: 5px 10px; border-radius: 5px;"
-);
+console.info("%c 🏠 HACS Compatible", "color: white; background: #4285F4; font-weight: bold; padding: 5px 10px; border-radius: 5px;");

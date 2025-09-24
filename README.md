@@ -31,12 +31,12 @@ A modern WebRTC SIP client card for Home Assistant that enables video calling fu
 ### HACS (Recommended)
 
 1. Open HACS in your Home Assistant instance
-2. Click on "Frontend" in the bottom bar
-3. Click on the 3-dots menu in the top right
-4. Select "Custom repositories"
-  5. Add this repository URL: `https://github.com/Ahmed9190/ha-webrtc-sip-card`
-6. Select "Lovelace" as category
-7. Click "Install"
+2. Click on the 3-dots menu in the top right corner
+3. Select "Custom repositories"
+4. Enter the repository URL: `https://github.com/Ahmed9190/ha-webrtc-sip-card`
+5. Select "Dashboard" as the type
+6. Click "ADD"
+7. Find the newly added repository in the list and click "Install"
 8. Restart Home Assistant
 
 ### Manual Installation
@@ -53,32 +53,33 @@ A modern WebRTC SIP client card for Home Assistant that enables video calling fu
 ## Configuration
 
 ### Visual Editor
+
 The easiest way to configure this card is through the visual editor in the Home Assistant dashboard UI.
 
 ### Manual Configuration
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `type` | string | **Required** | `custom:ha-webrtc-sip-card` |
-| `title` | string | `"WebRTC SIP Phone"` | Card title |
-| `server_url` | string | **Required** | SIP server WebSocket URL (e.g., `wss://your-sip-server.com:8089/ws`) |
-| `username` | string | **Required** | SIP account username |
-| `password` | string | **Required** | SIP account password |
-| `domain` | string | Optional | SIP domain (defaults to server hostname) |
-| `display_name` | string | Optional | Display name for outgoing calls |
-| `websocket_port` | number | `443` | WebSocket port (80 for ws, 443 for wss) |
-| `use_secure` | boolean | `false` | Use secure WebSocket connection |
-| `debug` | boolean | `false` | Enable debug logging |
-| `hide_keypad` | boolean | `false` | Hide the DTMF keypad |
-| `contacts` | array | `[]` | Array of contact objects |
+| Option           | Type    | Default              | Description                                                          |
+| ---------------- | ------- | -------------------- | -------------------------------------------------------------------- |
+| `type`           | string  | **Required**         | `custom:ha-webrtc-sip-card`                                          |
+| `title`          | string  | `"WebRTC SIP Phone"` | Card title                                                           |
+| `server_url`     | string  | **Required**         | SIP server WebSocket URL (e.g., `wss://your-sip-server.com:8089/ws`) |
+| `username`       | string  | **Required**         | SIP account username                                                 |
+| `password`       | string  | **Required**         | SIP account password                                                 |
+| `domain`         | string  | Optional             | SIP domain (defaults to server hostname)                             |
+| `display_name`   | string  | Optional             | Display name for outgoing calls                                      |
+| `websocket_port` | number  | `443`                | WebSocket port (80 for ws, 443 for wss)                              |
+| `use_secure`     | boolean | `false`              | Use secure WebSocket connection                                      |
+| `debug`          | boolean | `false`              | Enable debug logging                                                 |
+| `hide_keypad`    | boolean | `false`              | Hide the DTMF keypad                                                 |
+| `contacts`       | array   | `[]`                 | Array of contact objects                                             |
 
 ### Contact Configuration
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `name` | string | **Required** | Contact display name |
-| `extension` | string | **Required** | Contact extension to dial |
-| `icon` | string | `"mdi:account"` | Contact icon (Material Design icon) |
+| Option      | Type   | Default         | Description                         |
+| ----------- | ------ | --------------- | ----------------------------------- |
+| `name`      | string | **Required**    | Contact display name                |
+| `extension` | string | **Required**    | Contact extension to dial           |
+| `icon`      | string | `"mdi:account"` | Contact icon (Material Design icon) |
 
 ### Example Configuration
 
@@ -116,11 +117,13 @@ hide_keypad: false
 ### Common Issues
 
 1. **WebSocket Connection Failed**
+
    - Verify server URL and port are correct
    - Check that the SIP server is running and accessible
    - Ensure firewall allows WebSocket connections
 
 2. **Camera/Microphone Permissions**
+
    - Check browser permissions for camera and microphone
    - Ensure you're using HTTPS for production (required for WebRTC)
 
@@ -135,6 +138,7 @@ Enable debug mode in the card configuration to see detailed logs in your browser
 ## Development
 
 This card is built with:
+
 - [Lit](https://lit.dev/) - Modern web components
 - [TypeScript](https://www.typescriptlang.org/) - Type safety
 - [Vite](https://vitejs.dev/) - Build and development tools

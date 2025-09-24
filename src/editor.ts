@@ -86,7 +86,7 @@ export class WebRTCSipCardEditor extends LitElement {
 
         <h3>Contacts</h3>
         ${this._config.contacts.map(
-          (contact, index) => html`
+    (contact, index) => html`
             <div class="contact-row">
               <ha-textfield
                 label="Name"
@@ -115,7 +115,7 @@ export class WebRTCSipCardEditor extends LitElement {
               <ha-icon-button .label="Delete" .contactIndex="${index}" @click="${this._deleteContact}"><ha-icon icon="mdi:delete"></ha-icon></ha-icon-button>
             </div>
           `
-        )}
+  )}
 
         <ha-button @click="${this._addContact}"> Add Contact </ha-button>
       </div>
@@ -134,9 +134,9 @@ export class WebRTCSipCardEditor extends LitElement {
     // Convert comma-separated string to array
     const stunServers = value
       ? value
-          .split(",")
-          .map((url: string) => url.trim())
-          .filter((url: string) => url)
+        .split(",")
+        .map((url: string) => url.trim())
+        .filter((url: string) => url)
       : [];
 
     this._config = {

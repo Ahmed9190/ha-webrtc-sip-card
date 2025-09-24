@@ -76,11 +76,11 @@ export class SipManager extends EventTarget {
       },
       video: includeVideo
         ? {
-            width: { ideal: 640, min: 320, max: 1280 },
-            height: { ideal: 480, min: 240, max: 720 },
-            frameRate: { ideal: 30, min: 15, max: 30 },
-            facingMode: "user",
-          }
+          width: { ideal: 640, min: 320, max: 1280 },
+          height: { ideal: 480, min: 240, max: 720 },
+          frameRate: { ideal: 30, min: 15, max: 30 },
+          facingMode: "user",
+        }
         : false,
     };
 
@@ -335,35 +335,35 @@ export class SipManager extends EventTarget {
                           });
                         }
                       }
-                                      } else if (error.name === "AbortError") {
-                    debugLog(this.config?.debug || false, "Video play was interrupted, this is normal during stream updates");
+                    } else if (error.name === "AbortError") {
+                      debugLog(this.config?.debug || false, "Video play was interrupted, this is normal during stream updates");
                     
-                    // Retry after a short delay, but be more careful about the timing
-                    setTimeout(() => {
-                      if (this.remoteVideo && this.remoteVideo.srcObject) {
+                      // Retry after a short delay, but be more careful about the timing
+                      setTimeout(() => {
+                        if (this.remoteVideo && this.remoteVideo.srcObject) {
                         // Check if the video element is in a playable state
-                        if (this.remoteVideo.readyState >= 2) { // HAVE_CURRENT_DATA
-                          const retryPromise = this.remoteVideo.play();
-                          if (retryPromise !== undefined) {
-                            retryPromise.catch((retryError) => {
-                              debugLog(this.config?.debug || false, "Video play retry failed:", retryError);
-                            });
-                          }
-                        } else {
-                          // If not ready, wait a bit more
-                          setTimeout(() => {
-                            if (this.remoteVideo && this.remoteVideo.srcObject) {
-                              const retryPromise = this.remoteVideo.play();
-                              if (retryPromise !== undefined) {
-                                retryPromise.catch((retryError) => {
-                                  debugLog(this.config?.debug || false, "Delayed video play retry failed:", retryError);
-                                });
-                              }
+                          if (this.remoteVideo.readyState >= 2) { // HAVE_CURRENT_DATA
+                            const retryPromise = this.remoteVideo.play();
+                            if (retryPromise !== undefined) {
+                              retryPromise.catch((retryError) => {
+                                debugLog(this.config?.debug || false, "Video play retry failed:", retryError);
+                              });
                             }
-                          }, 200);
+                          } else {
+                          // If not ready, wait a bit more
+                            setTimeout(() => {
+                              if (this.remoteVideo && this.remoteVideo.srcObject) {
+                                const retryPromise = this.remoteVideo.play();
+                                if (retryPromise !== undefined) {
+                                  retryPromise.catch((retryError) => {
+                                    debugLog(this.config?.debug || false, "Delayed video play retry failed:", retryError);
+                                  });
+                                }
+                              }
+                            }, 200);
+                          }
                         }
-                      }
-                    }, 150);
+                      }, 150);
                     } else {
                       // Try to handle other errors by re-attaching the stream
                       if (this.remoteVideo && this.remoteVideo.srcObject) {
@@ -547,46 +547,63 @@ export class SipManager extends EventTarget {
   }
 
   private async waitForSipLibrary(timeout = 15000): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const startTime = Date.now();
       const timeoutId = setTimeout(() => {
         reject(new Error(`SIP.js library loading timeout after ${timeout}ms`));
       }, timeout);
 
-      const checkLibrary = async () => {
-        try {
-          if (!Web) {
-            const SIP = await import("sip.js");
-            Web = (SIP as any).Web || SIP;
+      // Store 'this' reference to maintain context in nested functions
+      const self = this;
+      
+      const checkLibrary = () => {
+        // First check if library is already loaded
+        if (!Web) {
+          // If not loaded, try to import it
+          import("sip.js")
+            .then(SIP => {
+              Web = (SIP as any).Web || SIP;
+              continueCheck();
+            })
+            .catch(() => {
+              // If import fails, schedule next check
+              setTimeout(checkLibrary, 200);
+            });
+        } else {
+          continueCheck();
+        }
+
+        function continueCheck() {
+          try {
+            const isFullyLoaded =
+              Web &&
+              Web.SimpleUser &&
+              Web.SimpleUser.prototype &&
+              typeof Web.SimpleUser.prototype.register === "function" &&
+              typeof Web.SimpleUser.prototype.connect === "function" &&
+              typeof Web.SimpleUser.prototype.disconnect === "function";
+
+            if (isFullyLoaded) {
+              clearTimeout(timeoutId);
+              debugLog(self.config?.debug || false, "SIP.js library fully loaded and verified");
+              resolve();
+              return;
+            }
+
+            if (Date.now() - startTime > timeout) {
+              clearTimeout(timeoutId);
+              reject(new Error("SIP.js library verification timeout"));
+              return;
+            }
+
+            setTimeout(checkLibrary, 100);
+          } catch (error) {
+            setTimeout(checkLibrary, 200);
           }
-
-          const isFullyLoaded =
-            Web &&
-            Web.SimpleUser &&
-            Web.SimpleUser.prototype &&
-            typeof Web.SimpleUser.prototype.register === "function" &&
-            typeof Web.SimpleUser.prototype.connect === "function" &&
-            typeof Web.SimpleUser.prototype.disconnect === "function";
-
-          if (isFullyLoaded) {
-            clearTimeout(timeoutId);
-            debugLog(this.config?.debug || false, "SIP.js library fully loaded and verified");
-            resolve();
-            return;
-          }
-
-          if (Date.now() - startTime > timeout) {
-            clearTimeout(timeoutId);
-            reject(new Error("SIP.js library verification timeout"));
-            return;
-          }
-
-          setTimeout(checkLibrary, 100);
-        } catch (error) {
-          setTimeout(checkLibrary, 200);
         }
       };
 
+      // Start the check process
       checkLibrary();
     });
   }
@@ -643,25 +660,25 @@ export class SipManager extends EventTarget {
       const getMediaOptions = (includeVideo: boolean = false) => ({
         constraints: includeVideo
           ? {
-              audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true,
-              },
-              video: {
-                width: { ideal: 640 },
-                height: { ideal: 480 },
-                frameRate: { ideal: 30 },
-              },
-            }
-          : {
-              audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true,
-              },
-              video: false,
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
             },
+            video: {
+              width: { ideal: 640 },
+              height: { ideal: 480 },
+              frameRate: { ideal: 30 },
+            },
+          }
+          : {
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+            },
+            video: false,
+          },
         remote: {
           audio: this.remoteAudio!,
           video: this.remoteVideo!,

@@ -390,20 +390,16 @@ export class CallManager extends EventTarget {
   }
 
   async toggleMute(): Promise<boolean> {
-    try {
-      if (this.callState.muted) {
-        await this.sipManager.unmute();
-        this.callState.muted = false;
-      } else {
-        await this.sipManager.mute();
-        this.callState.muted = true;
-      }
-
-      this.dispatchCallStateUpdate();
-      return this.callState.muted;
-    } catch (error) {
-      throw error;
+    if (this.callState.muted) {
+      await this.sipManager.unmute();
+      this.callState.muted = false;
+    } else {
+      await this.sipManager.mute();
+      this.callState.muted = true;
     }
+
+    this.dispatchCallStateUpdate();
+    return this.callState.muted;
   }
 
   sendDTMF(tone: string): void {
