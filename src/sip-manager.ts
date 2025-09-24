@@ -76,11 +76,11 @@ export class SipManager extends EventTarget {
       },
       video: includeVideo
         ? {
-          width: { ideal: 640, min: 320, max: 1280 },
-          height: { ideal: 480, min: 240, max: 720 },
-          frameRate: { ideal: 30, min: 15, max: 30 },
-          facingMode: "user",
-        }
+            width: { ideal: 640, min: 320, max: 1280 },
+            height: { ideal: 480, min: 240, max: 720 },
+            frameRate: { ideal: 30, min: 15, max: 30 },
+            facingMode: "user",
+          }
         : false,
     };
 
@@ -96,7 +96,7 @@ export class SipManager extends EventTarget {
 
     try {
       this.isEnablingVideo = true;
-      
+
       const stream = await this.getUserMedia(true);
 
       if (this.localStream) {
@@ -302,11 +302,11 @@ export class SipManager extends EventTarget {
                   })
                   .catch((error) => {
                     debugLog(this.config?.debug || false, "Remote video play failed:", error);
-                    
+
                     // Handle specific error types
                     if (error.name === "NotAllowedError") {
                       debugLog(this.config?.debug || false, "Video play not allowed, likely due to autoplay restrictions");
-                      
+
                       // Try to handle autoplay restrictions by muting and retrying
                       if (this.remoteVideo) {
                         this.remoteVideo.muted = true;
@@ -314,7 +314,7 @@ export class SipManager extends EventTarget {
                         if (retryPromise !== undefined) {
                           retryPromise.catch((retryError) => {
                             debugLog(this.config?.debug || false, "Muted video play retry failed:", retryError);
-                            
+
                             // Last resort: re-attach the stream
                             if (this.remoteVideo && this.remoteVideo.srcObject) {
                               const currentStream = this.remoteVideo.srcObject;
@@ -337,12 +337,13 @@ export class SipManager extends EventTarget {
                       }
                     } else if (error.name === "AbortError") {
                       debugLog(this.config?.debug || false, "Video play was interrupted, this is normal during stream updates");
-                    
+
                       // Retry after a short delay, but be more careful about the timing
                       setTimeout(() => {
                         if (this.remoteVideo && this.remoteVideo.srcObject) {
-                        // Check if the video element is in a playable state
-                          if (this.remoteVideo.readyState >= 2) { // HAVE_CURRENT_DATA
+                          // Check if the video element is in a playable state
+                          if (this.remoteVideo.readyState >= 2) {
+                            // HAVE_CURRENT_DATA
                             const retryPromise = this.remoteVideo.play();
                             if (retryPromise !== undefined) {
                               retryPromise.catch((retryError) => {
@@ -350,7 +351,7 @@ export class SipManager extends EventTarget {
                               });
                             }
                           } else {
-                          // If not ready, wait a bit more
+                            // If not ready, wait a bit more
                             setTimeout(() => {
                               if (this.remoteVideo && this.remoteVideo.srcObject) {
                                 const retryPromise = this.remoteVideo.play();
@@ -553,15 +554,41 @@ export class SipManager extends EventTarget {
         reject(new Error(`SIP.js library loading timeout after ${timeout}ms`));
       }, timeout);
 
-      // Store 'this' reference to maintain context in nested functions
-      const self = this;
-      
+      const continueCheck = () => {
+        try {
+          const isFullyLoaded =
+            Web &&
+            Web.SimpleUser &&
+            Web.SimpleUser.prototype &&
+            typeof Web.SimpleUser.prototype.register === "function" &&
+            typeof Web.SimpleUser.prototype.connect === "function" &&
+            typeof Web.SimpleUser.prototype.disconnect === "function";
+
+          if (isFullyLoaded) {
+            clearTimeout(timeoutId);
+            debugLog(this.config?.debug || false, "SIP.js library fully loaded and verified");
+            resolve();
+            return;
+          }
+
+          if (Date.now() - startTime > timeout) {
+            clearTimeout(timeoutId);
+            reject(new Error("SIP.js library verification timeout"));
+            return;
+          }
+
+          setTimeout(checkLibrary, 100);
+        } catch (error) {
+          setTimeout(checkLibrary, 200);
+        }
+      };
+
       const checkLibrary = () => {
         // First check if library is already loaded
         if (!Web) {
           // If not loaded, try to import it
           import("sip.js")
-            .then(SIP => {
+            .then((SIP) => {
               Web = (SIP as any).Web || SIP;
               continueCheck();
             })
@@ -571,35 +598,6 @@ export class SipManager extends EventTarget {
             });
         } else {
           continueCheck();
-        }
-
-        function continueCheck() {
-          try {
-            const isFullyLoaded =
-              Web &&
-              Web.SimpleUser &&
-              Web.SimpleUser.prototype &&
-              typeof Web.SimpleUser.prototype.register === "function" &&
-              typeof Web.SimpleUser.prototype.connect === "function" &&
-              typeof Web.SimpleUser.prototype.disconnect === "function";
-
-            if (isFullyLoaded) {
-              clearTimeout(timeoutId);
-              debugLog(self.config?.debug || false, "SIP.js library fully loaded and verified");
-              resolve();
-              return;
-            }
-
-            if (Date.now() - startTime > timeout) {
-              clearTimeout(timeoutId);
-              reject(new Error("SIP.js library verification timeout"));
-              return;
-            }
-
-            setTimeout(checkLibrary, 100);
-          } catch (error) {
-            setTimeout(checkLibrary, 200);
-          }
         }
       };
 
@@ -660,25 +658,25 @@ export class SipManager extends EventTarget {
       const getMediaOptions = (includeVideo: boolean = false) => ({
         constraints: includeVideo
           ? {
-            audio: {
-              echoCancellation: true,
-              noiseSuppression: true,
-              autoGainControl: true,
-            },
-            video: {
-              width: { ideal: 640 },
-              height: { ideal: 480 },
-              frameRate: { ideal: 30 },
-            },
-          }
+              audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true,
+              },
+              video: {
+                width: { ideal: 640 },
+                height: { ideal: 480 },
+                frameRate: { ideal: 30 },
+              },
+            }
           : {
-            audio: {
-              echoCancellation: true,
-              noiseSuppression: true,
-              autoGainControl: true,
+              audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true,
+              },
+              video: false,
             },
-            video: false,
-          },
         remote: {
           audio: this.remoteAudio!,
           video: this.remoteVideo!,
@@ -918,7 +916,7 @@ export class SipManager extends EventTarget {
                   this.localStream = null;
                 }
                 this.videoEnabled = false;
-                
+
                 if (this.currentCall) {
                   this.currentCall.state = "ended";
                   this.dispatchEvent(
@@ -1147,7 +1145,7 @@ export class SipManager extends EventTarget {
                 this.setupRemoteStreamHandlers(session);
                 this.forceRemoteVideoCheck(session);
               }, 100);
-              
+
               // Start the call timer when the call is established
               this.startCallTimer();
               break;
@@ -1168,7 +1166,7 @@ export class SipManager extends EventTarget {
                 this.localStream = null;
               }
               this.videoEnabled = false;
-              
+
               if (this.currentCall) {
                 this.currentCall.state = "ended";
                 this.dispatchEvent(
@@ -1204,7 +1202,7 @@ export class SipManager extends EventTarget {
       );
     } catch (error) {
       errorLog("Call failed", error);
-      
+
       // Stop local media tracks to release camera and microphone
       if (this.localStream) {
         this.localStream.getTracks().forEach((track) => {
@@ -1217,7 +1215,7 @@ export class SipManager extends EventTarget {
         });
         this.localStream = null;
       }
-      
+
       this.currentCall = null;
       this.dispatchEvent(
         new CustomEvent("callFailed", {
@@ -1331,7 +1329,8 @@ export class SipManager extends EventTarget {
                       setTimeout(() => {
                         if (this.remoteVideo && this.remoteVideo.srcObject) {
                           // Check if the video element is in a playable state
-                          if (this.remoteVideo.readyState >= 2) { // HAVE_CURRENT_DATA
+                          if (this.remoteVideo.readyState >= 2) {
+                            // HAVE_CURRENT_DATA
                             const retryPromise = this.remoteVideo.play();
                             if (retryPromise !== undefined) {
                               retryPromise.catch((retryError) => {
