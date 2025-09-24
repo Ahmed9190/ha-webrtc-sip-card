@@ -1,4 +1,4 @@
-export const CARD_VERSION = "1.0.0";
+export const CARD_VERSION = "1.0.1";
 export const CARD_NAME = "ha-webrtc-sip-card";
 
 export const DEFAULT_CONFIG = {
@@ -7,17 +7,12 @@ export const DEFAULT_CONFIG = {
   server_url: "",
   username: "",
   password: "",
-  domain: "",
-  display_name: "",
+  auto_answer: false,
   stun_servers: ["stun:stun.l.google.com:19302"],
   turn_servers: [],
-  auto_answer: false,
-  video_enabled: true,
-  dtmf_enabled: true,
   call_history_enabled: true,
   theme: "auto" as const,
   contacts: [],
-  hide_keypad: false,
   hide_video_controls: false,
   ring_timeout: 30000,
   debug: false,

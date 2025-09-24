@@ -35,20 +35,10 @@ export class WebRTCSipCardEditor extends LitElement {
           @input="${this._valueChanged}"
         ></ha-textfield>
 
-        <ha-textfield label="Domain" .value="${this._config.domain}" .configValue="${"domain"}" @input="${this._valueChanged}"></ha-textfield>
-
         <ha-textfield
           label="Display Name"
           .value="${this._config.display_name || ""}"
           .configValue="${"display_name"}"
-          @input="${this._valueChanged}"
-        ></ha-textfield>
-
-        <ha-textfield
-          label="WebSocket Port"
-          type="number"
-          .value="${this._config.websocket_port || 443}"
-          .configValue="${"websocket_port"}"
           @input="${this._valueChanged}"
         ></ha-textfield>
 
@@ -65,23 +55,8 @@ export class WebRTCSipCardEditor extends LitElement {
         </div>
 
         <div class="switch-container">
-          <label class="switch-label">Video Enabled by Default</label>
-          <ha-switch .checked="${this._config.video_enabled !== false}" .configValue="${"video_enabled"}" @change="${this._valueChanged}"></ha-switch>
-        </div>
-
-        <div class="switch-container">
-          <label class="switch-label">DTMF Enabled</label>
-          <ha-switch .checked="${this._config.dtmf_enabled !== false}" .configValue="${"dtmf_enabled"}" @change="${this._valueChanged}"></ha-switch>
-        </div>
-
-        <div class="switch-container">
           <label class="switch-label">Debug Mode</label>
           <ha-switch .checked="${this._config.debug === true}" .configValue="${"debug"}" @change="${this._valueChanged}"></ha-switch>
-        </div>
-
-        <div class="switch-container">
-          <label class="switch-label">Hide Keypad</label>
-          <ha-switch .checked="${this._config.hide_keypad === true}" .configValue="${"hide_keypad"}" @change="${this._valueChanged}"></ha-switch>
         </div>
 
         <h3>Contacts</h3>

@@ -16,18 +16,13 @@ export interface SIPCardConfig extends LovelaceCardConfig {
   server_url: string;
   username: string;
   password: string;
-  domain?: string;
   display_name?: string;
   stun_servers?: string[];
   turn_servers?: TURNServer[];
   auto_answer?: boolean;
-  video_enabled?: boolean;
-  dtmf_enabled?: boolean;
   call_history_enabled?: boolean;
   theme?: "auto" | "light" | "dark";
   contacts: SIPContact[];
-  hide_keypad?: boolean;
-  websocket_port?: number;
   [key: string]: unknown;
   hide_video_controls?: boolean;
   ring_timeout?: number;

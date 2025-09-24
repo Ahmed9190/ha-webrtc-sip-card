@@ -81,11 +81,9 @@ export class WebRTCSipCard extends LitElement {
       this.isRetrying = false;
 
       const sipConfig: SipConfig = {
-        server: this.config.server_url.replace(/^wss?:\/\//, "").replace(/:\d+$/, ""),
+        server: this.config.server_url,
         username: this.config.username,
         password: this.config.password,
-        domain: this.config.domain || this.config.server_url.replace(/^wss?:\/\//, "").replace(/:\d+$/, ""),
-        websocket_port: this.config.websocket_port ? Number(this.config.websocket_port) : this.config.server_url.includes("wss://") ? 443 : 80,
         use_secure: this.config.server_url.startsWith("wss://"),
         display_name: this.config.display_name,
         debug: this.config.debug,
@@ -202,9 +200,20 @@ export class WebRTCSipCard extends LitElement {
 
     this.sipManager.addEventListener("error", (event: any) => {
       const errorDetail = event.detail.error;
-      console.error("SIP Manager error:", errorDetail);
+      const errorType = event.detail.type;
+      console.error("SIP Manager error:", errorDetail, "Type:", errorType);
 
-      if (errorDetail.includes("WebSocket closed") || errorDetail.includes("1006")) {
+      if (errorType === "registration") {
+        this.error = `Registration failed: ${errorDetail}. Please check your credentials.`;
+        this.connected = false; // Treat as disconnected
+        this.registered = false;
+        this.isRetrying = false;
+        if (this.connectionRetryTimeout) {
+          clearTimeout(this.connectionRetryTimeout);
+          this.connectionRetryTimeout = null;
+        }
+        this.requestUpdate();
+      } else if (errorDetail.includes("WebSocket closed") || errorDetail.includes("1006")) {
         if (!this.isRetrying) {
           this.scheduleReconnect();
         }
@@ -593,7 +602,7 @@ export class WebRTCSipCard extends LitElement {
     return html`
       <div class="active-call">
         ${this.renderCallInfo()} ${this.renderVideoStatus()} ${this.renderVideoArea()} ${isIncoming ? this.renderIncomingCallControls() : ""}
-        ${isActive ? this.renderCallControls() : ""} ${isActive && !this.config.hide_keypad ? this.renderInCallKeypad() : ""}
+        ${isActive ? this.renderCallControls() : ""}         ${isActive ? this.renderInCallKeypad() : ""}
       </div>
     `;
   }

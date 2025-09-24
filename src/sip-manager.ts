@@ -8,8 +8,6 @@ export interface SipConfig {
   server: string;
   username: string;
   password: string;
-  domain: string;
-  websocket_port: number;
   use_secure: boolean;
   display_name?: string;
   debug?: boolean;
@@ -647,10 +645,10 @@ export class SipManager extends EventTarget {
       await this.waitForSipLibrary();
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      const wsProtocol = config.use_secure ? "wss" : "ws";
-      const wsPort = config.websocket_port || (config.use_secure ? 443 : 80);
-      const wsServer = `${wsProtocol}://${config.server}:${wsPort}`;
-      const sipAor = `sip:${config.username}@${config.domain}`;
+      const url = new URL(config.server);
+      const domain = url.hostname;
+      const wsServer = config.server;
+      const sipAor = `sip:${config.username}@${domain}`;
 
       debugLog(config.debug || false, "WebSocket URL:", wsServer);
       debugLog(config.debug || false, "SIP AOR:", sipAor);
@@ -693,8 +691,6 @@ export class SipManager extends EventTarget {
           transportOptions: {
             server: wsServer,
             connectionTimeout: 15,
-            maxReconnectionAttempts: 3,
-            reconnectionTimeout: 4,
           },
           logLevel: config.debug ? "debug" : "error",
           sessionDescriptionHandlerFactoryOptions: {
@@ -728,6 +724,25 @@ export class SipManager extends EventTarget {
         throw new Error("Failed to create SimpleUser instance");
       }
 
+      if (this.simpleUser.userAgent) {
+        this.simpleUser.userAgent.on("registrationFailed", (response: any) => {
+          this.isRegistered = false;
+          let error = "Registration failed";
+          if (response && response.statusCode) {
+            error += ` with status code ${response.statusCode}`;
+          }
+          errorLog(error);
+          this.dispatchEvent(
+            new CustomEvent("error", {
+              detail: {
+                error: error,
+                type: "registration",
+              },
+            })
+          );
+        });
+      }
+
       if (!this.simpleUser.register || typeof this.simpleUser.register !== "function") {
         throw new Error("SimpleUser register method not available - library incomplete");
       }
@@ -745,9 +760,6 @@ export class SipManager extends EventTarget {
 
       debugLog(config.debug || false, "Registering with SIP server...");
       await this.simpleUser.register();
-
-      this.isRegistered = true;
-      this.dispatchEvent(new CustomEvent("registered", { detail: { registered: true } }));
 
       this.startConnectionMonitoring();
 
@@ -1069,7 +1081,9 @@ export class SipManager extends EventTarget {
     }
 
     try {
-      const targetUri = `sip:${target}@${this.config!.domain}`;
+      const url = new URL(this.config!.server);
+      const domain = url.hostname;
+      const targetUri = `sip:${target}@${domain}`;
       debugLog(this.config?.debug || false, "Making VIDEO call to", targetUri, "with video:", includeVideo);
 
       if (!this.videoEnabled) {

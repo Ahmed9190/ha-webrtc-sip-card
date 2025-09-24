@@ -1,6 +1,6 @@
 {
-  "version": "1.0.2",
-  "build": 3,
+  "version": "1.0.1",
+  "build": 4,
   "prerelease": false,
   "channel": "stable",
   "compatibility": {

@@ -10,6 +10,7 @@ class VersionManager {
     this.versionFile = path.join(__dirname, '../version.json');
     this.packageFile = path.join(__dirname, '../package.json');
     this.hacsFile = path.join(__dirname, '../hacs.json');
+    this.constantsFile = path.join(__dirname, '../src/constants.ts');
   }
 
   getCurrentVersion() {
@@ -44,6 +45,11 @@ class VersionManager {
     const pkg = JSON.parse(fs.readFileSync(this.packageFile, 'utf8'));
     pkg.version = newVersion;
     fs.writeFileSync(this.packageFile, JSON.stringify(pkg, null, 2));
+
+    // Update constants.ts
+    const constants = fs.readFileSync(this.constantsFile, 'utf8');
+    const updatedConstants = constants.replace(/(export const CARD_VERSION = ")[^"]+(")/, `$1${newVersion}$2`);
+    fs.writeFileSync(this.constantsFile, updatedConstants);
 
     console.log(`Version updated to ${newVersion}`);
     return newVersion;
