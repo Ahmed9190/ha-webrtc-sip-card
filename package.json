@@ -1,29 +1,31 @@
 {
   "name": "ha-webrtc-sip-card",
-  "version": "1.0.7",
+  "version": "1.0.2",
   "description": "A modern WebRTC SIP client card for Home Assistant",
   "type": "module",
-  "main": "dist/card.js",
-  "module": "dist/card.js",
-  "types": "dist/types/card.d.ts",
+  "main": "dist/ha-webrtc-sip-card.js",
+  "module": "dist/ha-webrtc-sip-card.js",
+  "types": "dist/types/ha-webrtc-sip-card.d.ts",
   "files": [
     "dist/**/*"
   ],
   "exports": {
     ".": {
-      "import": "./dist/card.js",
-      "types": "./dist/types/card.d.ts"
+      "import": "./dist/ha-webrtc-sip-card.js",
+      "types": "./dist/types/ha-webrtc-sip-card.d.ts"
     },
     "./editor": {
-      "import": "./dist/editor.js",
-      "types": "./dist/types/editor.d.ts"
+      "import": "./dist/ha-webrtc-sip-card-editor.js",
+      "types": "./dist/types/ha-webrtc-sip-card-editor.d.ts"
     }
   },
   "scripts": {
     "clean": "rm -rf dist/*",
     "build:js": "vite build",
     "build:types": "tsc --emitDeclarationOnly && mkdir -p dist/types && mv dist/src/* dist/types/ 2>/dev/null || true && rmdir dist/src 2>/dev/null || true",
-    "build": "npm run clean && npm run build:js && npm run build:types && cp hacs.json dist/",
+    "build": "vite build",
+    "build:prod": "npm run clean && npm run build:js && npm run build:types && cp hacs.json dist/",
+    "optimize": "npm run clean && npm run build:js && npm run build:types && cp hacs.json dist/",
     "clean:root": "find . -maxdepth 1 -type f \\( -name '*.js' -o -name '*.d.ts' -o -name '*.d.ts.map' \\) ! -name 'vite.config.ts' -delete",
     "prepare": "npm run clean:root && npm run build",
     "dev": "vite --host 0.0.0.0 --port 3000",
@@ -31,7 +33,15 @@
     "lint": "eslint src --ext .ts",
     "type-check": "tsc --project tsconfig.typecheck.json",
     "serve": "vite build && vite preview",
-    "release": "npm version patch && git push && git push --tags"
+    "release": "npm version patch && git push && git push --tags",
+    "validate-version": "node scripts/version.js validate",
+    "validate": "node scripts/version.js validate",
+    "changelog": "node scripts/generate-release-notes.js",
+    "test": "npm run type-check && npm run lint",
+    "pre-release": "npm run validate && npm run test && npm run build:prod",
+    "release:patch": "npm run test && node scripts/version.js bump patch",
+    "release:minor": "npm run test && node scripts/version.js bump minor",
+    "release:major": "npm run test && node scripts/version.js bump major"
   },
   "repository": {
     "type": "git",
