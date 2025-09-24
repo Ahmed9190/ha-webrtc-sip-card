@@ -1,12 +1,11 @@
 {
   "name": "WebRTC SIP Card",
-  "domains": ["sip"],
-  "homeassistant": "2023.8.0",
   "render_readme": true,
-  "content_in_root": true,
-  "filename": "card.js",
-  "zip_release": true,
+  "filename": "dist/card.js",
+  "content_in_root": false,
+  "zip_release": false,
   "hacs": "1.6.0",
+  "domain": "ha_webrtc_sip_card",
   "documentation": "https://github.com/Ahmed9190/ha-webrtc-sip-card",
   "issue_tracker": "https://github.com/Ahmed9190/ha-webrtc-sip-card/issues",
   "codeowners": ["@Ahmed9190"]
