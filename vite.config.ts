@@ -19,7 +19,10 @@ export default defineConfig({
       output: {
         // Ensure each entry is a separate file
         manualChunks: undefined,
-        format: "es",
+        format: "esm",
+        entryFileNames: `[name].js`,
+        chunkFileNames: `[name].js`,
+        assetFileNames: `[name].[ext]`
       },
     },
     target: "es2017",

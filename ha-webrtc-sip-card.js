@@ -17,7 +17,7 @@ var __spreadValues = (a, b) => {
   return a;
 };
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-import { D as DEFAULT_CONFIG, i, r, C as CARD_VERSION, a as i$1, x, b as DTMF_KEYS, n, t } from "./constants-CTYZr85d.mjs";
+import { D as DEFAULT_CONFIG, i, r, C as CARD_VERSION, a as i$1, x, b as DTMF_KEYS, n, t } from "./constants.js";
 /**
  * @license
  * Copyright 2017 Google LLC
@@ -588,10 +588,29 @@ class SipManager extends EventTarget {
       const timeoutId = setTimeout(() => {
         reject(new Error(`SIP.js library loading timeout after ${timeout}ms`));
       }, timeout);
-      const self = this;
+      const continueCheck = () => {
+        var _a;
+        try {
+          const isFullyLoaded = Web && Web.SimpleUser && Web.SimpleUser.prototype && typeof Web.SimpleUser.prototype.register === "function" && typeof Web.SimpleUser.prototype.connect === "function" && typeof Web.SimpleUser.prototype.disconnect === "function";
+          if (isFullyLoaded) {
+            clearTimeout(timeoutId);
+            debugLog(((_a = this.config) == null ? void 0 : _a.debug) || false, "SIP.js library fully loaded and verified");
+            resolve();
+            return;
+          }
+          if (Date.now() - startTime > timeout) {
+            clearTimeout(timeoutId);
+            reject(new Error("SIP.js library verification timeout"));
+            return;
+          }
+          setTimeout(checkLibrary, 100);
+        } catch (error) {
+          setTimeout(checkLibrary, 200);
+        }
+      };
       const checkLibrary = () => {
         if (!Web) {
-          import("./index-CSEPR8Ne.mjs").then((SIP) => {
+          import("./index.js").then((SIP) => {
             Web = SIP.Web || SIP;
             continueCheck();
           }).catch(() => {
@@ -599,26 +618,6 @@ class SipManager extends EventTarget {
           });
         } else {
           continueCheck();
-        }
-        function continueCheck() {
-          var _a;
-          try {
-            const isFullyLoaded = Web && Web.SimpleUser && Web.SimpleUser.prototype && typeof Web.SimpleUser.prototype.register === "function" && typeof Web.SimpleUser.prototype.connect === "function" && typeof Web.SimpleUser.prototype.disconnect === "function";
-            if (isFullyLoaded) {
-              clearTimeout(timeoutId);
-              debugLog(((_a = self.config) == null ? void 0 : _a.debug) || false, "SIP.js library fully loaded and verified");
-              resolve();
-              return;
-            }
-            if (Date.now() - startTime > timeout) {
-              clearTimeout(timeoutId);
-              reject(new Error("SIP.js library verification timeout"));
-              return;
-            }
-            setTimeout(checkLibrary, 100);
-          } catch (error) {
-            setTimeout(checkLibrary, 200);
-          }
         }
       };
       checkLibrary();

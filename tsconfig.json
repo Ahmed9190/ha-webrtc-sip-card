@@ -6,12 +6,15 @@
       "DOM",
       "DOM.Iterable"
     ],
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "node16",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "isolatedModules": false,
+    "isolatedModules": true,
+    "allowJs": true,
+    "outDir": "./dist",
+    "declaration": true,
     "noEmit": true,
     "strict": true,
     "noUnusedLocals": false,
@@ -25,6 +28,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "vite.config.ts"
   ]
 }
