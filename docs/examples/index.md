@@ -148,29 +148,3 @@ contacts:
 debug: true
 use_secure: false  # For testing without SSL
 ```
-
-## Advanced Configuration with Custom Styling
-
-While the card doesn't support custom styling directly, you can use it within a stack-in-card or other layout cards:
-
-```yaml
-type: vertical-stack
-cards:
-  - type: custom:ha-webrtc-sip-card
-    title: Office Communication
-    server_url: wss://sip.office.local:8089/ws
-    username: office-assistant
-    password: password
-    contacts:
-      - name: Front Desk
-        extension: "1001"
-        icon: mdi:reception-4
-      - name: Conference Room
-        extension: "1002"
-        icon: mdi:video
-  - type: entities
-    entities:
-      - entity: sensor.phone_status
-      - entity: binary_sensor.phone_active
-    title: Phone Status
-```

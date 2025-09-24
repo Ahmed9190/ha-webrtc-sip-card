@@ -93,7 +93,7 @@ The easiest way to configure this card is through the visual editor in the Home 
 1. Add the WebRTC SIP Card to your dashboard
 2. Click on the "Configure" tab in the card editor
 3. Fill in the required fields: server URL, username, password
-4. Optionally set the title, domain, and other settings
+4. Optionally set the title, domain, display name, and other settings
 5. Add contacts using the "Add Contact" button
 6. Save the configuration
 
