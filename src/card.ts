@@ -33,8 +33,20 @@ export class WebRTCSipCard extends LitElement {
   private readonly MAX_RETRY_ATTEMPTS = 5;
   private readonly RETRY_DELAYS = [2000, 5000, 10000, 20000, 30000];
 
-  public static getConfigElement() {
-    return document.createElement("ha-webrtc-sip-card-editor");
+  static async getConfigElement() {
+    try {
+      // Only import if not already loaded
+      if (!customElements.get("ha-webrtc-sip-card-editor")) {
+        console.log("📦 Loading editor...");
+        await import("./editor.js");
+        console.log("✅ Editor loaded");
+      }
+
+      return document.createElement("ha-webrtc-sip-card-editor");
+    } catch (error) {
+      console.error("❌ Failed to load editor:", error);
+      return null;
+    }
   }
 
   public static getStubConfig(): SIPCardConfig {
