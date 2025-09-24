@@ -24,30 +24,24 @@ jobs:
     - name: Build
       run: npm run build
     
-    - name: Create ZIP for release
-      run: |
-        cd dist
-        zip -r ../ha-webrtc-sip-card-${{ github.ref_name }}.zip .
-        cd ..
-    
-    - name: Create Release
+    - name: Create release
       uses: softprops/action-gh-release@v1
       with:
+        name: ${{ github.ref_name }}
+        tag_name: ${{ github.ref_name }}
+        body: |
+          ## Release Notes
+          - Fixed HACS integration
+          - Updated build process
         files: |
-          ha-webrtc-sip-card-${{ github.ref_name }}.zip
           dist/ha-webrtc-sip-card.js
           dist/ha-webrtc-sip-card-editor.js
-        generate_release_notes: true
+          dist/constants.js
+          dist/hacs.json
         draft: false
         prerelease: false
+        generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Update HACS repository
-      uses: ludeeus/action-hacs@main
-      with:
-        category: "frontend"
-        version: ${{ github.ref_name }}
-        repository: ${{ github.repository }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        VERSION: ${{ github.ref_name }}
+        REPOSITORY: ${{ github.repository }}
