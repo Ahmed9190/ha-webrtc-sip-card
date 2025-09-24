@@ -83,7 +83,7 @@ The easiest way to configure this card is through the visual editor in the Home 
 
 ### Example Configuration
 
-```
+```yaml
 type: custom:ha-webrtc-sip-card
 title: Office Phone
 server_url: wss://sip.example.com:8089/ws

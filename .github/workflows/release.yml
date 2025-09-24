@@ -169,7 +169,7 @@ jobs:
       - name: Update HACS
         uses: ludeeus/action-hacs@main
         with:
-          category: "frontend"
+          category: "integration"
           version: ${{ needs.prepare.outputs.version }}
           repository: "${{ github.repository }}"
         env:

@@ -1,15 +1,15 @@
 import { defineConfig } from "vite";
-import { resolve } from 'path';
+import { resolve } from "path";
 
 export default defineConfig({
   plugins: [],
   build: {
     lib: {
       entry: {
-        card: resolve(__dirname, 'src/card.ts'),
-        editor: resolve(__dirname, 'src/editor.ts'),
+        "ha-webrtc-sip-card": resolve(__dirname, "src/card.ts"),
+        "ha-webrtc-sip-card-editor": resolve(__dirname, "src/editor.ts"),
       },
-      name: 'WebRTCSipCard',
+      name: "WebRTCSipCard",
     },
     rollupOptions: {
       output: {
@@ -18,7 +18,7 @@ export default defineConfig({
         format: "esm",
         entryFileNames: "[name].js",
         chunkFileNames: "[name].js",
-        assetFileNames: "[name].[ext]"
+        assetFileNames: "[name].[ext]",
       },
     },
     target: "es2017",

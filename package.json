@@ -35,7 +35,7 @@
     "serve": "vite build && vite preview",
     "release": "npm version patch && git push && git push --tags",
     "validate-version": "node scripts/version.js validate",
-    "validate": "node scripts/version.js validate",
+    "validate": "node scripts/validate.js",
     "changelog": "node scripts/generate-release-notes.js",
     "test": "npm run type-check && npm run lint",
     "pre-release": "npm run validate && npm run test && npm run build:prod",
@@ -70,7 +70,7 @@
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.57.0",
     "typescript": "~5.3.3",
-    "vite": "^5.2.8",
+    "vite": "^7.1.7",
     "vite-plugin-dts": "^4.5.4"
   },
   "dependencies": {
