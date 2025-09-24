@@ -19,8 +19,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -39,8 +39,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -122,6 +122,11 @@ jobs:
           name: dist-files
           path: dist/
 
+      - name: Create ZIP archive
+        run: |
+          cd dist
+          zip -r ../ha-webrtc-sip-card.zip .
+
       - name: Check if release needed
         id: release-check
         run: |
@@ -135,39 +140,38 @@ jobs:
             echo "version=${CURRENT_VERSION}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Create Release
+        if: steps.release-check.outputs.needs_release == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.release-check.outputs.version }}
+          name: Release v${{ steps.release-check.outputs.version }}
+          body: |
+            ## WebRTC SIP Card v${{ steps.release-check.outputs.version }}
 
-          - name: Create Release
-          if: steps.release-check.outputs.needs_release == 'true'
-          uses: softprops/action-gh-release@v1
-          with:
-            tag_name: v${{ steps.release-check.outputs.version }}
-            name: Release v${{ steps.release-check.outputs.version }}
-            body: |
-              ## WebRTC SIP Card v${{ steps.release-check.outputs.version }}
+            ### Installation via HACS
+            1. Open HACS in your Home Assistant instance
+            2. Click on the 3-dots menu in the top right corner
+            3. Select "Custom repositories"
+            4. Enter the repository URL: `https://github.com/Ahmed9190/ha-webrtc-sip-card`
+            5. Select "Dashboard" as the type
+            6. Click "ADD"
+            7. Find the newly added repository in the list and click "Install"
+            8. Restart Home Assistant
 
-              ### Installation via HACS
-              1. Open HACS in your Home Assistant instance
-              2. Click on the 3-dots menu in the top right corner
-              3. Select "Custom repositories"
-              4. Enter the repository URL: `https://github.com/Ahmed9190/ha-webrtc-sip-card`
-              5. Select "Dashboard" as the type
-              6. Click "ADD"
-              7. Find the newly added repository in the list and click "Install"
-              8. Restart Home Assistant
-
-              ### Manual Installation
-              Download and extract `ha-webrtc-sip-card.zip` to your `config/www/community/` folder
-              
-              ### Files
-              - `ha-webrtc-sip-card.js` - Main card component
-              - `ha-webrtc-sip-card-editor.js` - Configuration editor
-              
-              See [README.md](https://github.com/Ahmed9190/ha-webrtc-sip-card/blob/main/README.md) for configuration details.
-            draft: false
-            prerelease: false
-            files: |
-              dist/ha-webrtc-sip-card.js
-              dist/ha-webrtc-sip-card-editor.js
-              ha-webrtc-sip-card.zip
-            env:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            ### Manual Installation
+            Download and extract `ha-webrtc-sip-card.zip` to your `config/www/community/` folder
+            
+            ### Files
+            - `ha-webrtc-sip-card.js` - Main card component
+            - `ha-webrtc-sip-card-editor.js` - Configuration editor
+            
+            See [README.md](https://github.com/Ahmed9190/ha-webrtc-sip-card/blob/main/README.md) for configuration details.
+          draft: false
+          prerelease: false
+          files: |
+            dist/ha-webrtc-sip-card.js
+            dist/ha-webrtc-sip-card-editor.js
+            ha-webrtc-sip-card.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
