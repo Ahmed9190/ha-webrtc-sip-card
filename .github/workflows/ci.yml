@@ -19,8 +19,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -39,8 +39,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -161,17 +161,23 @@ jobs:
 
             ### Manual Installation
             Download and extract `ha-webrtc-sip-card.zip` to your `config/www/community/` folder
-            
+
             ### Files
             - `ha-webrtc-sip-card.js` - Main card component
             - `ha-webrtc-sip-card-editor.js` - Configuration editor
-            
+            - `constants.js` - Constants and utilities
+            - `index.js` - Entry point
+            - `hacs.json` - HACS configuration
+
             See [README.md](https://github.com/Ahmed9190/ha-webrtc-sip-card/blob/main/README.md) for configuration details.
           draft: false
           prerelease: false
           files: |
             dist/ha-webrtc-sip-card.js
             dist/ha-webrtc-sip-card-editor.js
+            dist/constants.js
+            dist/index.js
+            dist/hacs.json
             ha-webrtc-sip-card.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

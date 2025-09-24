@@ -36,7 +36,7 @@ services:
       - ./dist:/config/www/community/ha-webrtc-sip-card
       - /etc/localtime:/etc/localtime:ro
       - ./config/ha-config/configuration.yaml:/config/configuration.yaml
-      - ./config/ha-config/ui-lovelace.yaml:/config/ui-lovelace.yaml
+      # - ./config/ha-config/ui-lovelace.yaml:/config/ui-lovelace.yaml
     ports:
       - "8123:8123"
     restart: unless-stopped

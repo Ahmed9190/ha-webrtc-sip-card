@@ -10,20 +10,22 @@ export default defineConfig({
         "ha-webrtc-sip-card-editor": resolve(__dirname, "src/editor.ts"),
       },
       name: "WebRTCSipCard",
+      formats: ["es"],
     },
     rollupOptions: {
+      external: [],
       output: {
-        // Ensure each entry is a separate file
         manualChunks: undefined,
-        format: "esm",
+        format: "es",
         entryFileNames: "[name].js",
         chunkFileNames: "[name].js",
         assetFileNames: "[name].[ext]",
+        // Ensure no CommonJS globals
+        globals: {},
       },
     },
     target: "es2017",
     minify: false,
-    // Ensure all assets are copied to dist
     assetsInlineLimit: 0,
     copyPublicDir: false,
   },
