@@ -1,15 +1,12 @@
 {
   "name": "WebRTC SIP Card",
-  "hacs": "1.6.0",
   "render_readme": true,
-  "domains": ["frontend"],
-  "country": ["ALL"],
-  "iot_class": "Local Polling",
-  "homeassistant": "2023.4.0",
-  "filename": "dist/ha-webrtc-sip-card.js",
-  "zip_release": true,
-  "hide_default_branch": true,
+  "homeassistant": "2023.8.0",
+  "filename": "ha-webrtc-sip-card.js",
   "content_in_root": false,
+  "zip_release": true,
+  "hacs": "1.6.0",
+  "hide_default_branch": true,
   "persistent_directory": false,
   "render_readme_root": true
 }

@@ -1,20 +1,15 @@
 import { defineConfig } from "vite";
+import { resolve } from 'path';
 
 export default defineConfig({
+  plugins: [],
   build: {
-    sourcemap: false, // Disable source maps
     lib: {
-      entry: {
-        "ha-webrtc-sip-card": "./src/card.ts",
-        "ha-webrtc-sip-card-editor": "./src/editor.ts",
-      },
-      formats: ["es"],
-      fileName: (format, entryName) => `${entryName}.js`,
+      entry: resolve(__dirname, 'src/card.ts'),
+      name: 'WebRTCSipCard',
+      fileName: (format) => `ha-webrtc-sip-card.${format}.js`,
     },
-    outDir: "dist",
-    emptyOutDir: true,
     rollupOptions: {
-      external: [],
       output: {
         // Ensure each entry is a separate file
         manualChunks: undefined,
