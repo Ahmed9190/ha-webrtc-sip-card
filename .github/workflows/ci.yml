@@ -85,24 +85,23 @@ jobs:
 
           echo "All required files present ✓"
 
-  # HACS validation disabled until first release is created
-  # validate-hacs:
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   if: github.event_name == 'pull_request' || contains(github.ref, 'refs/tags/')
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Download build artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: dist-files
-  #         path: dist/
-  #     - name: HACS Validation
-  #       uses: hacs/action@main
-  #       with:
-  #         category: plugin
-  #         comment: true
-  #         github_token: ${{ secrets.GITHUB_TOKEN }}
+  validate-hacs:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'pull_request' || contains(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+      - name: HACS Validation
+        uses: hacs/action@main
+        with:
+          category: plugin
+          comment: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
   release:
     runs-on: ubuntu-latest
