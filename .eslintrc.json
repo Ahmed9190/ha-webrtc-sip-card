@@ -29,7 +29,7 @@
     ],
     "quotes": [
       "error",
-      "double"
+      "auto"
     ],
     "semi": [
       "error",
@@ -37,7 +37,7 @@
     ],
     "@typescript-eslint/no-unused-vars": [
       "error",
-      { 
+      {
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_",
         "caughtErrorsIgnorePattern": "^_"
@@ -45,5 +45,8 @@
     ],
     "no-undef": "off"
   },
-  "ignorePatterns": ["dist/", "node_modules/"]
+  "ignorePatterns": [
+    "dist/",
+    "node_modules/"
+  ]
 }

@@ -54,7 +54,7 @@ export class WebRTCSipCardEditor extends LitElement {
 
         <ha-textfield
           label="STUN Servers (comma-separated)"
-          .value="${this._config.stun_servers ? this._config.stun_servers.join(',') : DEFAULT_CONFIG.stun_servers.join(',')}"
+          .value="${this._config.stun_servers ? this._config.stun_servers.join(",") : DEFAULT_CONFIG.stun_servers.join(",")}"
           .configValue="${"stun_servers"}"
           @input="${this._stunServersChanged}"
         ></ha-textfield>
@@ -132,7 +132,12 @@ export class WebRTCSipCardEditor extends LitElement {
     const configValue = target.configValue;
 
     // Convert comma-separated string to array
-    const stunServers = value ? value.split(',').map((url: string) => url.trim()).filter((url: string) => url) : [];
+    const stunServers = value
+      ? value
+          .split(",")
+          .map((url: string) => url.trim())
+          .filter((url: string) => url)
+      : [];
 
     this._config = {
       ...this._config,
@@ -158,14 +163,14 @@ export class WebRTCSipCardEditor extends LitElement {
     const configValue = target.configValue;
 
     // Handle boolean values for switches
-    if (target.tagName === 'HA-SWITCH') {
+    if (target.tagName === "HA-SWITCH") {
       value = target.checked;
     }
     // Handle select elements
-    else if (target.tagName === 'HA-SELECT' || target.tagName === 'MWC-LIST-ITEM') {
+    else if (target.tagName === "HA-SELECT" || target.tagName === "MWC-LIST-ITEM") {
       value = target.value || (ev as CustomEvent).detail?.value || target.selected;
       // Handle the case where selected is an index rather than the value
-      if (typeof value === 'number' && target.children && target.children[value]) {
+      if (typeof value === "number" && target.children && target.children[value]) {
         value = target.children[value].value;
       }
     }
@@ -296,7 +301,7 @@ export class WebRTCSipCardEditor extends LitElement {
     ha-icon-button {
       --mdc-icon-button-size: 40px;
       align-self: center;
-      margin-top: 16px;  /* Align with text fields */
+      margin-top: 16px; /* Align with text fields */
       color: var(--error-color, #ff0000);
       cursor: pointer;
     }
@@ -312,7 +317,7 @@ export class WebRTCSipCardEditor extends LitElement {
       font-weight: 500;
       color: var(--primary-text-color);
     }
-    
+
     .switch-label {
       display: inline-block;
       margin-right: 8px;
@@ -322,14 +327,14 @@ export class WebRTCSipCardEditor extends LitElement {
       color: var(--primary-text-color);
       font-size: 14px;
     }
-    
+
     .switch-container {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 8px 0;
     }
-    
+
     .switch-container ha-switch {
       margin-left: auto;
     }
