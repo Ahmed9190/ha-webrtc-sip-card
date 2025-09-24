@@ -23,7 +23,7 @@
     "clean": "rm -rf dist/*",
     "build:js": "vite build",
     "build:types": "tsc --emitDeclarationOnly && mkdir -p dist/types && mv dist/src/* dist/types/ 2>/dev/null || true && rmdir dist/src 2>/dev/null || true",
-    "build": "npm run clean && npm run build:js && npm run build:types",
+    "build": "npm run clean && npm run build:js && npm run build:types && cp hacs.json dist/",
     "clean:root": "find . -maxdepth 1 -type f \\( -name '*.js' -o -name '*.d.ts' -o -name '*.d.ts.map' \\) ! -name 'vite.config.ts' -delete",
     "prepare": "npm run clean:root && npm run build",
     "dev": "vite --host 0.0.0.0 --port 3000",

@@ -26,6 +26,9 @@ export default defineConfig({
     },
     target: "es2017",
     minify: false,
+    // Ensure all assets are copied to dist
+    assetsInlineLimit: 0,
+    copyPublicDir: false,
   },
   define: {
     __DEV__: JSON.stringify(process.env.NODE_ENV === "development"),
