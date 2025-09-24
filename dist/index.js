@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const LIBRARY_VERSION = "0.21.1";
 class Exception extends Error {
   constructor(message) {
@@ -1946,8 +1948,8 @@ function peg$parse(input, options) {
   }
 }
 const parse = peg$parse;
-var Grammar;
-(function(Grammar2) {
+exports.Grammar = void 0;
+(function(Grammar) {
   function parse$1(input, startRule) {
     const options = { startRule };
     try {
@@ -1957,18 +1959,18 @@ var Grammar;
     }
     return options.data;
   }
-  Grammar2.parse = parse$1;
+  Grammar.parse = parse$1;
   function nameAddrHeaderParse(nameAddrHeader) {
-    const parsedNameAddrHeader = Grammar2.parse(nameAddrHeader, "Name_Addr_Header");
+    const parsedNameAddrHeader = Grammar.parse(nameAddrHeader, "Name_Addr_Header");
     return parsedNameAddrHeader !== -1 ? parsedNameAddrHeader : void 0;
   }
-  Grammar2.nameAddrHeaderParse = nameAddrHeaderParse;
+  Grammar.nameAddrHeaderParse = nameAddrHeaderParse;
   function URIParse(uri) {
-    const parsedUri = Grammar2.parse(uri, "SIP_URI");
+    const parsedUri = Grammar.parse(uri, "SIP_URI");
     return parsedUri !== -1 ? parsedUri : void 0;
   }
-  Grammar2.URIParse = URIParse;
-})(Grammar = Grammar || (Grammar = {}));
+  Grammar.URIParse = URIParse;
+})(exports.Grammar = exports.Grammar || (exports.Grammar = {}));
 const REASON_PHRASE = {
   100: "Trying",
   180: "Ringing",
@@ -2160,7 +2162,7 @@ class IncomingMessage {
     if (header.parsed) {
       return header.parsed;
     }
-    const parsed = Grammar.parse(value, name2.replace(/-/g, "_"));
+    const parsed = exports.Grammar.parse(value, name2.replace(/-/g, "_"));
     if (parsed === -1) {
       this.headers[name2].splice(idx, 1);
       return;
@@ -2481,14 +2483,14 @@ function getBody(message) {
     content
   };
 }
-var SessionState$1;
+var SessionState;
 (function(SessionState2) {
   SessionState2["Initial"] = "Initial";
   SessionState2["Early"] = "Early";
   SessionState2["AckWait"] = "AckWait";
   SessionState2["Confirmed"] = "Confirmed";
   SessionState2["Terminated"] = "Terminated";
-})(SessionState$1 = SessionState$1 || (SessionState$1 = {}));
+})(SessionState = SessionState || (SessionState = {}));
 var SignalingState;
 (function(SignalingState2) {
   SignalingState2["Initial"] = "Initial";
@@ -2666,14 +2668,14 @@ class Referral {
     return this.inviter;
   }
 }
-var SessionState;
+exports.SessionState = void 0;
 (function(SessionState2) {
   SessionState2["Initial"] = "Initial";
   SessionState2["Establishing"] = "Establishing";
   SessionState2["Established"] = "Established";
   SessionState2["Terminating"] = "Terminating";
   SessionState2["Terminated"] = "Terminated";
-})(SessionState = SessionState || (SessionState = {}));
+})(exports.SessionState = exports.SessionState || (exports.SessionState = {}));
 class Session {
   /**
    * Constructor.
@@ -2683,7 +2685,7 @@ class Session {
   constructor(userAgent, options = {}) {
     this.pendingReinvite = false;
     this.pendingReinviteAck = false;
-    this._state = SessionState.Initial;
+    this._state = exports.SessionState.Initial;
     this.delegate = options.delegate;
     this._stateEventEmitter = new EmitterImpl();
     this._userAgent = userAgent;
@@ -2698,11 +2700,11 @@ class Session {
       this._sessionDescriptionHandler.close();
     }
     switch (this.state) {
-      case SessionState.Initial:
+      case exports.SessionState.Initial:
         break;
-      case SessionState.Establishing:
+      case exports.SessionState.Establishing:
         break;
-      case SessionState.Established:
+      case exports.SessionState.Established:
         return new Promise((resolve) => {
           this._bye({
             // wait for the response to the BYE before resolving
@@ -2711,9 +2713,9 @@ class Session {
             onReject: () => resolve()
           });
         });
-      case SessionState.Terminating:
+      case exports.SessionState.Terminating:
         break;
-      case SessionState.Terminated:
+      case exports.SessionState.Terminated:
         break;
       default:
         throw new Error("Unknown state.");
@@ -2845,7 +2847,7 @@ class Session {
   bye(options = {}) {
     let message = "Session.bye() may only be called if established session.";
     switch (this.state) {
-      case SessionState.Initial:
+      case exports.SessionState.Initial:
         if (typeof this.cancel === "function") {
           message += " However Inviter.invite() has not yet been called.";
           message += " Perhaps you should have called Inviter.cancel()?";
@@ -2854,7 +2856,7 @@ class Session {
           message += " Perhaps you should have called Invitation.reject()?";
         }
         break;
-      case SessionState.Establishing:
+      case exports.SessionState.Establishing:
         if (typeof this.cancel === "function") {
           message += " However a dialog does not yet exist.";
           message += " Perhaps you should have called Inviter.cancel()?";
@@ -2863,12 +2865,12 @@ class Session {
           message += " Perhaps you should have called Invitation.reject()?";
         }
         break;
-      case SessionState.Established: {
+      case exports.SessionState.Established: {
         const requestDelegate = options.requestDelegate;
         const requestOptions = this.copyRequestOptions(options.requestOptions);
         return this._bye(requestDelegate, requestOptions);
       }
-      case SessionState.Terminating:
+      case exports.SessionState.Terminating:
         message += " However this session is already terminating.";
         if (typeof this.cancel === "function") {
           message += " Perhaps you have already called Inviter.cancel()?";
@@ -2876,7 +2878,7 @@ class Session {
           message += " Perhaps you have already called Session.bye()?";
         }
         break;
-      case SessionState.Terminated:
+      case exports.SessionState.Terminated:
         message += " However this session is already terminated.";
         break;
       default:
@@ -2890,7 +2892,7 @@ class Session {
    * @param options - Options bucket. See {@link SessionInfoOptions} for details.
    */
   info(options = {}) {
-    if (this.state !== SessionState.Established) {
+    if (this.state !== exports.SessionState.Established) {
       const message = "Session.info() may only be called if established session.";
       this.logger.error(message);
       return Promise.reject(new Error(`Invalid session state ${this.state}`));
@@ -2905,7 +2907,7 @@ class Session {
    */
   invite(options = {}) {
     this.logger.log("Session.invite");
-    if (this.state !== SessionState.Established) {
+    if (this.state !== exports.SessionState.Established) {
       return Promise.reject(new Error(`Invalid session state ${this.state}`));
     }
     if (this.pendingReinvite) {
@@ -2924,7 +2926,7 @@ class Session {
         if (!body) {
           this.logger.error("Received 2xx response to re-INVITE without a session description");
           this.ackAndBye(response, 400, "Missing session description");
-          this.stateTransition(SessionState.Terminated);
+          this.stateTransition(exports.SessionState.Terminated);
           this.pendingReinvite = false;
           return;
         }
@@ -2938,11 +2940,11 @@ class Session {
           }).catch((error) => {
             this.logger.error("Failed to handle offer in 2xx response to re-INVITE");
             this.logger.error(error.message);
-            if (this.state === SessionState.Terminated) {
+            if (this.state === exports.SessionState.Terminated) {
               response.ack();
             } else {
               this.ackAndBye(response, 488, "Bad Media Description");
-              this.stateTransition(SessionState.Terminated);
+              this.stateTransition(exports.SessionState.Terminated);
             }
           }).then(() => {
             this.pendingReinvite = false;
@@ -2960,9 +2962,9 @@ class Session {
           }).catch((error) => {
             this.logger.error("Failed to handle answer in 2xx response to re-INVITE");
             this.logger.error(error.message);
-            if (this.state !== SessionState.Terminated) {
+            if (this.state !== exports.SessionState.Terminated) {
               this.ackAndBye(response, 488, "Bad Media Description");
-              this.stateTransition(SessionState.Terminated);
+              this.stateTransition(exports.SessionState.Terminated);
             } else {
               response.ack();
             }
@@ -2993,14 +2995,14 @@ class Session {
           this.rollbackOffer().catch((error) => {
             this.logger.error("Failed to rollback offer on non-2xx response to re-INVITE");
             this.logger.error(error.message);
-            if (this.state !== SessionState.Terminated) {
+            if (this.state !== exports.SessionState.Terminated) {
               if (!this.dialog) {
                 throw new Error("Dialog undefined.");
               }
               const extraHeaders = [];
               extraHeaders.push("Reason: " + this.getReasonHeaderValue(500, "Internal Server Error"));
               this.dialog.bye(void 0, { extraHeaders });
-              this.stateTransition(SessionState.Terminated);
+              this.stateTransition(exports.SessionState.Terminated);
             }
           }).then(() => {
             if (options.requestDelegate && options.requestDelegate.onReject) {
@@ -3048,7 +3050,7 @@ class Session {
    * @param options - Options bucket. See {@link SessionMessageOptions} for details.
    */
   message(options = {}) {
-    if (this.state !== SessionState.Established) {
+    if (this.state !== exports.SessionState.Established) {
       const message = "Session.message() may only be called if established session.";
       this.logger.error(message);
       return Promise.reject(new Error(`Invalid session state ${this.state}`));
@@ -3063,7 +3065,7 @@ class Session {
    * @param options - Options bucket. See {@link SessionReferOptions} for details.
    */
   refer(referTo, options = {}) {
-    if (this.state !== SessionState.Established) {
+    if (this.state !== exports.SessionState.Established) {
       const message = "Session.refer() may only be called if established session.";
       this.logger.error(message);
       return Promise.reject(new Error(`Invalid session state ${this.state}`));
@@ -3090,36 +3092,36 @@ class Session {
     }
     const dialog = this.dialog;
     switch (dialog.sessionState) {
-      case SessionState$1.Initial:
+      case SessionState.Initial:
         throw new Error(`Invalid dialog state ${dialog.sessionState}`);
-      case SessionState$1.Early:
+      case SessionState.Early:
         throw new Error(`Invalid dialog state ${dialog.sessionState}`);
-      case SessionState$1.AckWait: {
-        this.stateTransition(SessionState.Terminating);
+      case SessionState.AckWait: {
+        this.stateTransition(exports.SessionState.Terminating);
         return new Promise((resolve) => {
           dialog.delegate = {
             // When ACK shows up, say BYE.
             onAck: () => {
               const request = dialog.bye(delegate, options);
-              this.stateTransition(SessionState.Terminated);
+              this.stateTransition(exports.SessionState.Terminated);
               resolve(request);
               return Promise.resolve();
             },
             // Or the server transaction times out before the ACK arrives.
             onAckTimeout: () => {
               const request = dialog.bye(delegate, options);
-              this.stateTransition(SessionState.Terminated);
+              this.stateTransition(exports.SessionState.Terminated);
               resolve(request);
             }
           };
         });
       }
-      case SessionState$1.Confirmed: {
+      case SessionState.Confirmed: {
         const request = dialog.bye(delegate, options);
-        this.stateTransition(SessionState.Terminated);
+        this.stateTransition(exports.SessionState.Terminated);
         return Promise.resolve(request);
       }
-      case SessionState$1.Terminated:
+      case SessionState.Terminated:
         throw new Error(`Invalid dialog state ${dialog.sessionState}`);
       default:
         throw new Error("Unrecognized state.");
@@ -3189,7 +3191,7 @@ class Session {
    */
   onAckRequest(request) {
     this.logger.log("Session.onAckRequest");
-    if (this.state !== SessionState.Established && this.state !== SessionState.Terminating) {
+    if (this.state !== exports.SessionState.Established && this.state !== exports.SessionState.Terminating) {
       this.logger.error(`ACK received while in state ${this.state}, dropping request`);
       return Promise.resolve();
     }
@@ -3211,7 +3213,7 @@ class Session {
         this.logger.error(`Invalid signaling state ${dialog.signalingState}.`);
         const extraHeaders = ["Reason: " + this.getReasonHeaderValue(488, "Bad Media Description")];
         dialog.bye(void 0, { extraHeaders });
-        this.stateTransition(SessionState.Terminated);
+        this.stateTransition(exports.SessionState.Terminated);
         return Promise.resolve();
       }
       case SignalingState.Stable: {
@@ -3231,21 +3233,21 @@ class Session {
           this.logger.error(error.message);
           const extraHeaders = ["Reason: " + this.getReasonHeaderValue(488, "Bad Media Description")];
           dialog.bye(void 0, { extraHeaders });
-          this.stateTransition(SessionState.Terminated);
+          this.stateTransition(exports.SessionState.Terminated);
         });
       }
       case SignalingState.HaveLocalOffer: {
         this.logger.error(`Invalid signaling state ${dialog.signalingState}.`);
         const extraHeaders = ["Reason: " + this.getReasonHeaderValue(488, "Bad Media Description")];
         dialog.bye(void 0, { extraHeaders });
-        this.stateTransition(SessionState.Terminated);
+        this.stateTransition(exports.SessionState.Terminated);
         return Promise.resolve();
       }
       case SignalingState.HaveRemoteOffer: {
         this.logger.error(`Invalid signaling state ${dialog.signalingState}.`);
         const extraHeaders = ["Reason: " + this.getReasonHeaderValue(488, "Bad Media Description")];
         dialog.bye(void 0, { extraHeaders });
-        this.stateTransition(SessionState.Terminated);
+        this.stateTransition(exports.SessionState.Terminated);
         return Promise.resolve();
       }
       case SignalingState.Closed:
@@ -3260,7 +3262,7 @@ class Session {
    */
   onByeRequest(request) {
     this.logger.log("Session.onByeRequest");
-    if (this.state !== SessionState.Established) {
+    if (this.state !== exports.SessionState.Established) {
       this.logger.error(`BYE received while in state ${this.state}, dropping request`);
       return;
     }
@@ -3270,7 +3272,7 @@ class Session {
     } else {
       request.accept();
     }
-    this.stateTransition(SessionState.Terminated);
+    this.stateTransition(exports.SessionState.Terminated);
   }
   /**
    * Handle in dialog INFO request.
@@ -3278,7 +3280,7 @@ class Session {
    */
   onInfoRequest(request) {
     this.logger.log("Session.onInfoRequest");
-    if (this.state !== SessionState.Established) {
+    if (this.state !== exports.SessionState.Established) {
       this.logger.error(`INFO received while in state ${this.state}, dropping request`);
       return;
     }
@@ -3295,7 +3297,7 @@ class Session {
    */
   onInviteRequest(request) {
     this.logger.log("Session.onInviteRequest");
-    if (this.state !== SessionState.Established) {
+    if (this.state !== exports.SessionState.Established) {
       this.logger.error(`INVITE received while in state ${this.state}, dropping request`);
       return;
     }
@@ -3306,7 +3308,7 @@ class Session {
       if (!header) {
         throw new Error("Header undefined.");
       }
-      this._assertedIdentity = Grammar.nameAddrHeaderParse(header);
+      this._assertedIdentity = exports.Grammar.nameAddrHeaderParse(header);
     }
     const options = {
       sessionDescriptionHandlerOptions: this.sessionDescriptionHandlerOptionsReInvite,
@@ -3340,14 +3342,14 @@ class Session {
         this.logger.error(errorRollback.message);
         this.logger.error("Failed to rollback offer on re-INVITE request");
         const outgoingResponse = request.reject({ statusCode: 488 });
-        if (this.state !== SessionState.Terminated) {
+        if (this.state !== exports.SessionState.Terminated) {
           if (!this.dialog) {
             throw new Error("Dialog undefined.");
           }
           const extraHeadersBye = [];
           extraHeadersBye.push("Reason: " + this.getReasonHeaderValue(500, "Internal Server Error"));
           this.dialog.bye(void 0, { extraHeaders: extraHeadersBye });
-          this.stateTransition(SessionState.Terminated);
+          this.stateTransition(exports.SessionState.Terminated);
         }
         if (this.delegate && this.delegate.onInvite) {
           this.delegate.onInvite(request.message, outgoingResponse.message, 488);
@@ -3361,7 +3363,7 @@ class Session {
    */
   onMessageRequest(request) {
     this.logger.log("Session.onMessageRequest");
-    if (this.state !== SessionState.Established) {
+    if (this.state !== exports.SessionState.Established) {
       this.logger.error(`MESSAGE received while in state ${this.state}, dropping request`);
       return;
     }
@@ -3378,7 +3380,7 @@ class Session {
    */
   onNotifyRequest(request) {
     this.logger.log("Session.onNotifyRequest");
-    if (this.state !== SessionState.Established) {
+    if (this.state !== exports.SessionState.Established) {
       this.logger.error(`NOTIFY received while in state ${this.state}, dropping request`);
       return;
     }
@@ -3401,7 +3403,7 @@ class Session {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onPrackRequest(request) {
     this.logger.log("Session.onPrackRequest");
-    if (this.state !== SessionState.Established) {
+    if (this.state !== exports.SessionState.Established) {
       this.logger.error(`PRACK received while in state ${this.state}, dropping request`);
       return;
     }
@@ -3413,7 +3415,7 @@ class Session {
    */
   onReferRequest(request) {
     this.logger.log("Session.onReferRequest");
-    if (this.state !== SessionState.Established) {
+    if (this.state !== exports.SessionState.Established) {
       this.logger.error(`REFER received while in state ${this.state}, dropping request`);
       return;
     }
@@ -3471,7 +3473,7 @@ class Session {
         }
         return this.setOfferAndGetAnswer(this.dialog.offer, options);
       case SignalingState.Stable:
-        if (this.state !== SessionState.Established) {
+        if (this.state !== exports.SessionState.Established) {
           return Promise.resolve(void 0);
         }
         return this.getOffer(options);
@@ -3624,27 +3626,27 @@ class Session {
       throw new Error(`Invalid state transition from ${this._state} to ${newState}`);
     };
     switch (this._state) {
-      case SessionState.Initial:
-        if (newState !== SessionState.Establishing && newState !== SessionState.Established && newState !== SessionState.Terminating && newState !== SessionState.Terminated) {
+      case exports.SessionState.Initial:
+        if (newState !== exports.SessionState.Establishing && newState !== exports.SessionState.Established && newState !== exports.SessionState.Terminating && newState !== exports.SessionState.Terminated) {
           invalidTransition();
         }
         break;
-      case SessionState.Establishing:
-        if (newState !== SessionState.Established && newState !== SessionState.Terminating && newState !== SessionState.Terminated) {
+      case exports.SessionState.Establishing:
+        if (newState !== exports.SessionState.Established && newState !== exports.SessionState.Terminating && newState !== exports.SessionState.Terminated) {
           invalidTransition();
         }
         break;
-      case SessionState.Established:
-        if (newState !== SessionState.Terminating && newState !== SessionState.Terminated) {
+      case exports.SessionState.Established:
+        if (newState !== exports.SessionState.Terminating && newState !== exports.SessionState.Terminated) {
           invalidTransition();
         }
         break;
-      case SessionState.Terminating:
-        if (newState !== SessionState.Terminated) {
+      case exports.SessionState.Terminating:
+        if (newState !== exports.SessionState.Terminated) {
           invalidTransition();
         }
         break;
-      case SessionState.Terminated:
+      case exports.SessionState.Terminated:
         invalidTransition();
         break;
       default:
@@ -3653,7 +3655,7 @@ class Session {
     this._state = newState;
     this.logger.log(`Session ${this.id} transitioned to state ${this._state}`);
     this._stateEventEmitter.emit(this._state);
-    if (newState === SessionState.Terminated) {
+    if (newState === exports.SessionState.Terminated) {
       this.dispose();
     }
   }
@@ -3704,12 +3706,12 @@ class Session {
     return referTo;
   }
 }
-var SIPExtension;
-(function(SIPExtension2) {
-  SIPExtension2["Required"] = "Required";
-  SIPExtension2["Supported"] = "Supported";
-  SIPExtension2["Unsupported"] = "Unsupported";
-})(SIPExtension = SIPExtension || (SIPExtension = {}));
+exports.SIPExtension = void 0;
+(function(SIPExtension) {
+  SIPExtension["Required"] = "Required";
+  SIPExtension["Supported"] = "Supported";
+  SIPExtension["Unsupported"] = "Unsupported";
+})(exports.SIPExtension = exports.SIPExtension || (exports.SIPExtension = {}));
 const UserAgentRegisteredOptionTags = {
   "100rel": true,
   "199": true,
@@ -3774,20 +3776,20 @@ class Invitation extends Session {
     }
     this.userNoAnswerTimer = setTimeout(() => {
       incomingInviteRequest.reject({ statusCode: 480 });
-      this.stateTransition(SessionState.Terminated);
+      this.stateTransition(exports.SessionState.Terminated);
     }, this.userAgent.configuration.noAnswerTimeout ? this.userAgent.configuration.noAnswerTimeout * 1e3 : 6e4);
     if (incomingRequestMessage.hasHeader("expires")) {
       const expires = Number(incomingRequestMessage.getHeader("expires") || 0) * 1e3;
       this.expiresTimer = setTimeout(() => {
-        if (this.state === SessionState.Initial) {
+        if (this.state === exports.SessionState.Initial) {
           incomingInviteRequest.reject({ statusCode: 487 });
-          this.stateTransition(SessionState.Terminated);
+          this.stateTransition(exports.SessionState.Terminated);
         }
       }, expires);
     }
     const assertedIdentity = this.request.getHeader("P-Asserted-Identity");
     if (assertedIdentity) {
-      this._assertedIdentity = Grammar.nameAddrHeaderParse(assertedIdentity);
+      this._assertedIdentity = exports.Grammar.nameAddrHeaderParse(assertedIdentity);
     }
     this._contact = this.userAgent.contact.toString();
     const contentDisposition = incomingRequestMessage.parseHeader("Content-Disposition");
@@ -3816,15 +3818,15 @@ class Invitation extends Session {
     }
     this.prackNeverArrived();
     switch (this.state) {
-      case SessionState.Initial:
+      case exports.SessionState.Initial:
         return this.reject().then(() => super.dispose());
-      case SessionState.Establishing:
+      case exports.SessionState.Establishing:
         return this.reject().then(() => super.dispose());
-      case SessionState.Established:
+      case exports.SessionState.Established:
         return super.dispose();
-      case SessionState.Terminating:
+      case exports.SessionState.Terminating:
         return super.dispose();
-      case SessionState.Terminated:
+      case exports.SessionState.Terminated:
         return super.dispose();
       default:
         throw new Error("Unknown state.");
@@ -3880,7 +3882,7 @@ class Invitation extends Session {
    */
   accept(options = {}) {
     this.logger.log("Invitation.accept");
-    if (this.state !== SessionState.Initial) {
+    if (this.state !== exports.SessionState.Initial) {
       const error = new Error(`Invalid session state ${this.state}`);
       this.logger.error(error.message);
       return Promise.reject(error);
@@ -3891,7 +3893,7 @@ class Invitation extends Session {
     if (options.sessionDescriptionHandlerOptions) {
       this.sessionDescriptionHandlerOptions = options.sessionDescriptionHandlerOptions;
     }
-    this.stateTransition(SessionState.Establishing);
+    this.stateTransition(exports.SessionState.Establishing);
     return this.sendAccept(options).then(({ message, session }) => {
       session.delegate = {
         onAck: (ackRequest) => this.onAckRequest(ackRequest),
@@ -3905,7 +3907,7 @@ class Invitation extends Session {
         onRefer: (referRequest) => this.onReferRequest(referRequest)
       };
       this._dialog = session;
-      this.stateTransition(SessionState.Established);
+      this.stateTransition(exports.SessionState.Established);
       if (this._replacee) {
         this._replacee._bye();
       }
@@ -3922,7 +3924,7 @@ class Invitation extends Session {
    */
   progress(options = {}) {
     this.logger.log("Invitation.progress");
-    if (this.state !== SessionState.Initial) {
+    if (this.state !== exports.SessionState.Initial) {
       const error = new Error(`Invalid session state ${this.state}`);
       this.logger.error(error.message);
       return Promise.reject(error);
@@ -3946,7 +3948,7 @@ class Invitation extends Session {
         return;
       }).catch((error) => this.handleResponseError(error));
     }
-    if (!(this.rel100 === "required") && !(this.rel100 === "supported" && options.rel100) && !(this.rel100 === "supported" && this.userAgent.configuration.sipExtension100rel === SIPExtension.Required)) {
+    if (!(this.rel100 === "required") && !(this.rel100 === "supported" && options.rel100) && !(this.rel100 === "supported" && this.userAgent.configuration.sipExtension100rel === exports.SIPExtension.Required)) {
       return this.sendProgress(options).then(() => {
         return;
       }).catch((error) => this.handleResponseError(error));
@@ -3971,7 +3973,7 @@ class Invitation extends Session {
    */
   reject(options = {}) {
     this.logger.log("Invitation.reject");
-    if (this.state !== SessionState.Initial && this.state !== SessionState.Establishing) {
+    if (this.state !== exports.SessionState.Initial && this.state !== exports.SessionState.Establishing) {
       const error = new Error(`Invalid session state ${this.state}`);
       this.logger.error(error.message);
       return Promise.reject(error);
@@ -3984,7 +3986,7 @@ class Invitation extends Session {
     }
     const body = options.body ? fromBodyLegacy(options.body) : void 0;
     statusCode < 400 ? this.incomingInviteRequest.redirect([], { statusCode, reasonPhrase, extraHeaders, body }) : this.incomingInviteRequest.reject({ statusCode, reasonPhrase, extraHeaders, body });
-    this.stateTransition(SessionState.Terminated);
+    this.stateTransition(exports.SessionState.Terminated);
     return Promise.resolve();
   }
   /**
@@ -3996,7 +3998,7 @@ class Invitation extends Session {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _onCancel(message) {
     this.logger.log("Invitation._onCancel");
-    if (this.state !== SessionState.Initial && this.state !== SessionState.Establishing) {
+    if (this.state !== exports.SessionState.Initial && this.state !== exports.SessionState.Establishing) {
       this.logger.error(`CANCEL received while in state ${this.state}, dropping request`);
       return;
     }
@@ -4006,7 +4008,7 @@ class Invitation extends Session {
     }
     this.isCanceled = true;
     this.incomingInviteRequest.reject({ statusCode: 487 });
-    this.stateTransition(SessionState.Terminated);
+    this.stateTransition(exports.SessionState.Terminated);
   }
   /**
    * Helper function to handle offer/answer in a PRACK.
@@ -4062,10 +4064,10 @@ class Invitation extends Session {
     } else if (error instanceof TransactionStateError) {
       this.logger.error("Session changed state before response could be formulated and sent");
     }
-    if (this.state === SessionState.Initial || this.state === SessionState.Establishing) {
+    if (this.state === exports.SessionState.Initial || this.state === exports.SessionState.Establishing) {
       try {
         this.incomingInviteRequest.reject({ statusCode });
-        this.stateTransition(SessionState.Terminated);
+        this.stateTransition(exports.SessionState.Terminated);
       } catch (e) {
         this.logger.error("An error occurred attempting to reject the request while handling another error");
         throw e;
@@ -4088,7 +4090,7 @@ class Invitation extends Session {
     }
     this.logger.log("No ACK received for an extended period of time, terminating session");
     this.dialog.bye();
-    this.stateTransition(SessionState.Terminated);
+    this.stateTransition(exports.SessionState.Terminated);
   }
   /**
    * A version of `accept` which resolves a session when the 200 Ok response is sent.
@@ -4310,14 +4312,14 @@ class Inviter extends Session {
     }
     let fromURI = userAgent.userAgentCore.configuration.aor;
     if (inviterOptions.params.fromUri) {
-      fromURI = typeof inviterOptions.params.fromUri === "string" ? Grammar.URIParse(inviterOptions.params.fromUri) : inviterOptions.params.fromUri;
+      fromURI = typeof inviterOptions.params.fromUri === "string" ? exports.Grammar.URIParse(inviterOptions.params.fromUri) : inviterOptions.params.fromUri;
     }
     if (!fromURI) {
       throw new TypeError("Invalid from URI: " + inviterOptions.params.fromUri);
     }
     let toURI = targetURI;
     if (inviterOptions.params.toUri) {
-      toURI = typeof inviterOptions.params.toUri === "string" ? Grammar.URIParse(inviterOptions.params.toUri) : inviterOptions.params.toUri;
+      toURI = typeof inviterOptions.params.toUri === "string" ? exports.Grammar.URIParse(inviterOptions.params.toUri) : inviterOptions.params.toUri;
     }
     if (!toURI) {
       throw new TypeError("Invalid to URI: " + inviterOptions.params.toUri);
@@ -4331,10 +4333,10 @@ class Inviter extends Session {
     }
     extraHeaders.push("Contact: " + contact);
     extraHeaders.push("Allow: " + ["ACK", "CANCEL", "INVITE", "MESSAGE", "BYE", "OPTIONS", "INFO", "NOTIFY", "REFER"].toString());
-    if (userAgent.configuration.sipExtension100rel === SIPExtension.Required) {
+    if (userAgent.configuration.sipExtension100rel === exports.SIPExtension.Required) {
       extraHeaders.push("Require: 100rel");
     }
-    if (userAgent.configuration.sipExtensionReplaces === SIPExtension.Required) {
+    if (userAgent.configuration.sipExtensionReplaces === exports.SIPExtension.Required) {
       extraHeaders.push("Require: replaces");
     }
     inviterOptions.extraHeaders = extraHeaders;
@@ -4369,15 +4371,15 @@ class Inviter extends Session {
     this.disposed = true;
     this.disposeEarlyMedia();
     switch (this.state) {
-      case SessionState.Initial:
+      case exports.SessionState.Initial:
         return this.cancel().then(() => super.dispose());
-      case SessionState.Establishing:
+      case exports.SessionState.Establishing:
         return this.cancel().then(() => super.dispose());
-      case SessionState.Established:
+      case exports.SessionState.Established:
         return super.dispose();
-      case SessionState.Terminating:
+      case exports.SessionState.Terminating:
         return super.dispose();
-      case SessionState.Terminated:
+      case exports.SessionState.Terminated:
         return super.dispose();
       default:
         throw new Error("Unknown state.");
@@ -4423,13 +4425,13 @@ class Inviter extends Session {
    */
   cancel(options = {}) {
     this.logger.log("Inviter.cancel");
-    if (this.state !== SessionState.Initial && this.state !== SessionState.Establishing) {
+    if (this.state !== exports.SessionState.Initial && this.state !== exports.SessionState.Establishing) {
       const error = new Error(`Invalid session state ${this.state}`);
       this.logger.error(error.message);
       return Promise.reject(error);
     }
     this.isCanceled = true;
-    this.stateTransition(SessionState.Terminating);
+    this.stateTransition(exports.SessionState.Terminating);
     function getCancelReason(code, reason) {
       if (code && code < 200 || code > 699) {
         throw new TypeError("Invalid statusCode: " + code);
@@ -4447,7 +4449,7 @@ class Inviter extends Session {
       this.outgoingInviteRequest.cancel(cancelReason, options);
     } else {
       this.logger.warn("Canceled session before INVITE was sent");
-      this.stateTransition(SessionState.Terminated);
+      this.stateTransition(exports.SessionState.Terminated);
     }
     return Promise.resolve();
   }
@@ -4537,7 +4539,7 @@ class Inviter extends Session {
    */
   invite(options = {}) {
     this.logger.log("Inviter.invite");
-    if (this.state !== SessionState.Initial) {
+    if (this.state !== exports.SessionState.Initial) {
       return super.invite(options);
     }
     if (options.sessionDescriptionHandlerModifiers) {
@@ -4550,7 +4552,7 @@ class Inviter extends Session {
       if (this._renderbody && this._rendertype) {
         this.outgoingRequestMessage.body = { contentType: this._rendertype, body: this._renderbody };
       }
-      this.stateTransition(SessionState.Establishing);
+      this.stateTransition(exports.SessionState.Establishing);
       return Promise.resolve(this.sendInvite(options));
     }
     const offerOptions = {
@@ -4559,12 +4561,12 @@ class Inviter extends Session {
     };
     return this.getOffer(offerOptions).then((body) => {
       this.outgoingRequestMessage.body = { body: body.content, contentType: body.contentType };
-      this.stateTransition(SessionState.Establishing);
+      this.stateTransition(exports.SessionState.Establishing);
       return this.sendInvite(options);
     }).catch((error) => {
       this.logger.log(error.message);
-      if (this.state !== SessionState.Terminated) {
-        this.stateTransition(SessionState.Terminated);
+      if (this.state !== exports.SessionState.Terminated) {
+        this.stateTransition(exports.SessionState.Terminated);
       }
       throw error;
     });
@@ -4619,7 +4621,7 @@ class Inviter extends Session {
         if (this.isCanceled) {
           this.logger.log("Canceled session accepted, sending ACK and BYE");
           this.ackAndBye(inviteResponse);
-          this.stateTransition(SessionState.Terminated);
+          this.stateTransition(exports.SessionState.Terminated);
           return;
         }
         this.notifyReferer(inviteResponse);
@@ -4715,14 +4717,14 @@ class Inviter extends Session {
    */
   onAccept(inviteResponse) {
     this.logger.log("Inviter.onAccept");
-    if (this.state !== SessionState.Establishing) {
+    if (this.state !== exports.SessionState.Establishing) {
       this.logger.error(`Accept received while in state ${this.state}, dropping response`);
       return Promise.reject(new Error(`Invalid session state ${this.state}`));
     }
     const response = inviteResponse.message;
     const session = inviteResponse.session;
     if (response.hasHeader("P-Asserted-Identity")) {
-      this._assertedIdentity = Grammar.nameAddrHeaderParse(response.getHeader("P-Asserted-Identity"));
+      this._assertedIdentity = exports.Grammar.nameAddrHeaderParse(response.getHeader("P-Asserted-Identity"));
     }
     session.delegate = {
       onAck: (ackRequest) => this.onAckRequest(ackRequest),
@@ -4739,12 +4741,12 @@ class Inviter extends Session {
       case SignalingState.Initial:
         this.logger.error("Received 2xx response to INVITE without a session description");
         this.ackAndBye(inviteResponse, 400, "Missing session description");
-        this.stateTransition(SessionState.Terminated);
+        this.stateTransition(exports.SessionState.Terminated);
         return Promise.reject(new Error("Bad Media Description"));
       case SignalingState.HaveLocalOffer:
         this.logger.error("Received 2xx response to INVITE without a session description");
         this.ackAndBye(inviteResponse, 400, "Missing session description");
-        this.stateTransition(SessionState.Terminated);
+        this.stateTransition(exports.SessionState.Terminated);
         return Promise.reject(new Error("Bad Media Description"));
       case SignalingState.HaveRemoteOffer: {
         if (!this._dialog.offer) {
@@ -4756,10 +4758,10 @@ class Inviter extends Session {
         };
         return this.setOfferAndGetAnswer(this._dialog.offer, options).then((body) => {
           inviteResponse.ack({ body });
-          this.stateTransition(SessionState.Established);
+          this.stateTransition(exports.SessionState.Established);
         }).catch((error) => {
           this.ackAndBye(inviteResponse, 488, "Invalid session description");
-          this.stateTransition(SessionState.Terminated);
+          this.stateTransition(exports.SessionState.Terminated);
           throw error;
         });
       }
@@ -4772,7 +4774,7 @@ class Inviter extends Session {
           this.setSessionDescriptionHandler(sdh);
           this.earlyMediaSessionDescriptionHandlers.delete(session.id);
           inviteResponse.ack();
-          this.stateTransition(SessionState.Established);
+          this.stateTransition(exports.SessionState.Established);
           return Promise.resolve();
         }
         if (this.earlyMediaDialog) {
@@ -4784,11 +4786,11 @@ class Inviter extends Session {
             const error = new Error("Early media dialog does not equal confirmed dialog, terminating session");
             this.logger.error(error.message);
             this.ackAndBye(inviteResponse, 488, "Not Acceptable Here");
-            this.stateTransition(SessionState.Terminated);
+            this.stateTransition(exports.SessionState.Terminated);
             return Promise.reject(error);
           }
           inviteResponse.ack();
-          this.stateTransition(SessionState.Established);
+          this.stateTransition(exports.SessionState.Established);
           return Promise.resolve();
         }
         const answer = session.answer;
@@ -4807,11 +4809,11 @@ class Inviter extends Session {
             };
           }
           inviteResponse.ack(ackOptions);
-          this.stateTransition(SessionState.Established);
+          this.stateTransition(exports.SessionState.Established);
         }).catch((error) => {
           this.logger.error(error.message);
           this.ackAndBye(inviteResponse, 488, "Not Acceptable Here");
-          this.stateTransition(SessionState.Terminated);
+          this.stateTransition(exports.SessionState.Terminated);
           throw error;
         });
       }
@@ -4828,7 +4830,7 @@ class Inviter extends Session {
   onProgress(inviteResponse) {
     var _a;
     this.logger.log("Inviter.onProgress");
-    if (this.state !== SessionState.Establishing) {
+    if (this.state !== exports.SessionState.Establishing) {
       this.logger.error(`Progress received while in state ${this.state}, dropping response`);
       return Promise.reject(new Error(`Invalid session state ${this.state}`));
     }
@@ -4838,7 +4840,7 @@ class Inviter extends Session {
     const response = inviteResponse.message;
     const session = inviteResponse.session;
     if (response.hasHeader("P-Asserted-Identity")) {
-      this._assertedIdentity = Grammar.nameAddrHeaderParse(response.getHeader("P-Asserted-Identity"));
+      this._assertedIdentity = exports.Grammar.nameAddrHeaderParse(response.getHeader("P-Asserted-Identity"));
     }
     const requireHeader = response.getHeader("require");
     const rseqHeader = response.getHeader("rseq");
@@ -4879,7 +4881,7 @@ class Inviter extends Session {
             };
             inviteResponse.prack({ extraHeaders, body });
           }).catch((error) => {
-            this.stateTransition(SessionState.Terminated);
+            this.stateTransition(exports.SessionState.Terminated);
             throw error;
           });
         }
@@ -4898,7 +4900,7 @@ class Inviter extends Session {
             sessionDescriptionHandlerOptions: this.sessionDescriptionHandlerOptions
           };
           return this.setAnswer(answer, options).catch((error) => {
-            this.stateTransition(SessionState.Terminated);
+            this.stateTransition(exports.SessionState.Terminated);
             throw error;
           });
         }
@@ -4916,11 +4918,11 @@ class Inviter extends Session {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onRedirect(inviteResponse) {
     this.logger.log("Inviter.onRedirect");
-    if (this.state !== SessionState.Establishing && this.state !== SessionState.Terminating) {
+    if (this.state !== exports.SessionState.Establishing && this.state !== exports.SessionState.Terminating) {
       this.logger.error(`Redirect received while in state ${this.state}, dropping response`);
       return;
     }
-    this.stateTransition(SessionState.Terminated);
+    this.stateTransition(exports.SessionState.Terminated);
   }
   /**
    * Handle final response to initial INVITE.
@@ -4929,11 +4931,11 @@ class Inviter extends Session {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onReject(inviteResponse) {
     this.logger.log("Inviter.onReject");
-    if (this.state !== SessionState.Establishing && this.state !== SessionState.Terminating) {
+    if (this.state !== exports.SessionState.Establishing && this.state !== exports.SessionState.Terminating) {
       this.logger.error(`Reject received while in state ${this.state}, dropping response`);
       return;
     }
-    this.stateTransition(SessionState.Terminated);
+    this.stateTransition(exports.SessionState.Terminated);
   }
   /**
    * Handle final response to initial INVITE.
@@ -4942,7 +4944,7 @@ class Inviter extends Session {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onTrying(inviteResponse) {
     this.logger.log("Inviter.onTrying");
-    if (this.state !== SessionState.Establishing) {
+    if (this.state !== exports.SessionState.Establishing) {
       this.logger.error(`Trying received while in state ${this.state}, dropping response`);
       return;
     }
@@ -4962,14 +4964,14 @@ class Messager {
     options.params = options.params || {};
     let fromURI = userAgent.userAgentCore.configuration.aor;
     if (options.params.fromUri) {
-      fromURI = typeof options.params.fromUri === "string" ? Grammar.URIParse(options.params.fromUri) : options.params.fromUri;
+      fromURI = typeof options.params.fromUri === "string" ? exports.Grammar.URIParse(options.params.fromUri) : options.params.fromUri;
     }
     if (!fromURI) {
       throw new TypeError("Invalid from URI: " + options.params.fromUri);
     }
     let toURI = targetURI;
     if (options.params.toUri) {
-      toURI = typeof options.params.toUri === "string" ? Grammar.URIParse(options.params.toUri) : options.params.toUri;
+      toURI = typeof options.params.toUri === "string" ? exports.Grammar.URIParse(options.params.toUri) : options.params.toUri;
     }
     if (!toURI) {
       throw new TypeError("Invalid to URI: " + options.params.toUri);
@@ -4993,13 +4995,13 @@ class Messager {
     return Promise.resolve();
   }
 }
-var PublisherState;
-(function(PublisherState2) {
-  PublisherState2["Initial"] = "Initial";
-  PublisherState2["Published"] = "Published";
-  PublisherState2["Unpublished"] = "Unpublished";
-  PublisherState2["Terminated"] = "Terminated";
-})(PublisherState = PublisherState || (PublisherState = {}));
+exports.PublisherState = void 0;
+(function(PublisherState) {
+  PublisherState["Initial"] = "Initial";
+  PublisherState["Published"] = "Published";
+  PublisherState["Unpublished"] = "Unpublished";
+  PublisherState["Terminated"] = "Terminated";
+})(exports.PublisherState = exports.PublisherState || (exports.PublisherState = {}));
 class Publisher {
   /**
    * Constructs a new instance of the `Publisher` class.
@@ -5011,7 +5013,7 @@ class Publisher {
    */
   constructor(userAgent, targetURI, eventType, options = {}) {
     this.disposed = false;
-    this._state = PublisherState.Initial;
+    this._state = exports.PublisherState.Initial;
     this._stateEventEmitter = new EmitterImpl();
     this.userAgent = userAgent;
     options.extraHeaders = (options.extraHeaders || []).slice();
@@ -5058,7 +5060,7 @@ class Publisher {
     this.disposed = true;
     this.logger.log(`Publisher ${this.id} in state ${this.state} is being disposed`);
     delete this.userAgent._publishers[this.id];
-    if (this.options.unpublishOnClose && this.state === PublisherState.Published) {
+    if (this.options.unpublishOnClose && this.state === exports.PublisherState.Published) {
       return this.unpublish();
     }
     if (this.publishRefreshTimer) {
@@ -5140,11 +5142,11 @@ class Publisher {
         }
         if (this.pubRequestExpires !== 0) {
           this.publishRefreshTimer = setTimeout(() => this.refreshRequest(), this.pubRequestExpires * 900);
-          if (this._state !== PublisherState.Published) {
-            this.stateTransition(PublisherState.Published);
+          if (this._state !== exports.PublisherState.Published) {
+            this.stateTransition(exports.PublisherState.Published);
           }
         } else {
-          this.stateTransition(PublisherState.Unpublished);
+          this.stateTransition(exports.PublisherState.Unpublished);
         }
         break;
       case /^412$/.test(statusCode.toString()):
@@ -5158,8 +5160,8 @@ class Publisher {
         } else {
           this.logger.warn("412 response to PUBLISH, recovery failed");
           this.pubRequestExpires = 0;
-          this.stateTransition(PublisherState.Unpublished);
-          this.stateTransition(PublisherState.Terminated);
+          this.stateTransition(exports.PublisherState.Unpublished);
+          this.stateTransition(exports.PublisherState.Terminated);
         }
         break;
       case /^423$/.test(statusCode.toString()):
@@ -5175,20 +5177,20 @@ class Publisher {
           } else {
             this.logger.warn("Bad 423 response Min-Expires header received for PUBLISH");
             this.pubRequestExpires = 0;
-            this.stateTransition(PublisherState.Unpublished);
-            this.stateTransition(PublisherState.Terminated);
+            this.stateTransition(exports.PublisherState.Unpublished);
+            this.stateTransition(exports.PublisherState.Terminated);
           }
         } else {
           this.logger.warn("423 response to PUBLISH, recovery failed");
           this.pubRequestExpires = 0;
-          this.stateTransition(PublisherState.Unpublished);
-          this.stateTransition(PublisherState.Terminated);
+          this.stateTransition(exports.PublisherState.Unpublished);
+          this.stateTransition(exports.PublisherState.Terminated);
         }
         break;
       default:
         this.pubRequestExpires = 0;
-        this.stateTransition(PublisherState.Unpublished);
-        this.stateTransition(PublisherState.Terminated);
+        this.stateTransition(exports.PublisherState.Unpublished);
+        this.stateTransition(exports.PublisherState.Terminated);
         break;
     }
     if (this.pubRequestExpires === 0) {
@@ -5259,22 +5261,22 @@ class Publisher {
       throw new Error(`Invalid state transition from ${this._state} to ${newState}`);
     };
     switch (this._state) {
-      case PublisherState.Initial:
-        if (newState !== PublisherState.Published && newState !== PublisherState.Unpublished && newState !== PublisherState.Terminated) {
+      case exports.PublisherState.Initial:
+        if (newState !== exports.PublisherState.Published && newState !== exports.PublisherState.Unpublished && newState !== exports.PublisherState.Terminated) {
           invalidTransition();
         }
         break;
-      case PublisherState.Published:
-        if (newState !== PublisherState.Unpublished && newState !== PublisherState.Terminated) {
+      case exports.PublisherState.Published:
+        if (newState !== exports.PublisherState.Unpublished && newState !== exports.PublisherState.Terminated) {
           invalidTransition();
         }
         break;
-      case PublisherState.Unpublished:
-        if (newState !== PublisherState.Published && newState !== PublisherState.Terminated) {
+      case exports.PublisherState.Unpublished:
+        if (newState !== exports.PublisherState.Published && newState !== exports.PublisherState.Terminated) {
           invalidTransition();
         }
         break;
-      case PublisherState.Terminated:
+      case exports.PublisherState.Terminated:
         invalidTransition();
         break;
       default:
@@ -5283,18 +5285,18 @@ class Publisher {
     this._state = newState;
     this.logger.log(`Publication transitioned to state ${this._state}`);
     this._stateEventEmitter.emit(this._state);
-    if (newState === PublisherState.Terminated) {
+    if (newState === exports.PublisherState.Terminated) {
       this.dispose();
     }
   }
 }
-var RegistererState;
-(function(RegistererState2) {
-  RegistererState2["Initial"] = "Initial";
-  RegistererState2["Registered"] = "Registered";
-  RegistererState2["Unregistered"] = "Unregistered";
-  RegistererState2["Terminated"] = "Terminated";
-})(RegistererState = RegistererState || (RegistererState = {}));
+exports.RegistererState = void 0;
+(function(RegistererState) {
+  RegistererState["Initial"] = "Initial";
+  RegistererState["Registered"] = "Registered";
+  RegistererState["Unregistered"] = "Unregistered";
+  RegistererState["Terminated"] = "Terminated";
+})(exports.RegistererState = exports.RegistererState || (exports.RegistererState = {}));
 class Registerer {
   /**
    * Constructs a new instance of the `Registerer` class.
@@ -5305,7 +5307,7 @@ class Registerer {
     this.disposed = false;
     this._contacts = [];
     this._retryAfter = void 0;
-    this._state = RegistererState.Initial;
+    this._state = exports.RegistererState.Initial;
     this._waiting = false;
     this._stateEventEmitter = new EmitterImpl();
     this._waitingEventEmitter = new EmitterImpl();
@@ -5324,7 +5326,7 @@ class Registerer {
     } else if (!this.options.regId && this.options.instanceId) {
       this.options.regId = 1;
     }
-    if (this.options.instanceId && Grammar.parse(this.options.instanceId, "uuid") === -1) {
+    if (this.options.instanceId && exports.Grammar.parse(this.options.instanceId, "uuid") === -1) {
       throw new Error("Invalid instanceId.");
     }
     if (this.options.regId && this.options.regId < 0) {
@@ -5447,7 +5449,7 @@ class Registerer {
     delete this.userAgent._registerers[this.id];
     return new Promise((resolve) => {
       const doClose = () => {
-        if (!this.waiting && this._state === RegistererState.Registered) {
+        if (!this.waiting && this._state === exports.RegistererState.Registered) {
           this.stateChange.addListener(() => {
             this.terminated();
             resolve();
@@ -5474,7 +5476,7 @@ class Registerer {
    * Rejects with `RequestPendingError` if a REGISTER request is already in progress.
    */
   register(options = {}) {
-    if (this.state === RegistererState.Terminated) {
+    if (this.state === exports.RegistererState.Terminated) {
       this.stateError();
       throw new Error("Registerer terminated. Unable to register.");
     }
@@ -5548,13 +5550,13 @@ class Registerer {
         if (contact.hasParam("temp-gruu")) {
           const gruu = contact.getParam("temp-gruu");
           if (gruu) {
-            this.userAgent.contact.tempGruu = Grammar.URIParse(gruu.replace(/"/g, ""));
+            this.userAgent.contact.tempGruu = exports.Grammar.URIParse(gruu.replace(/"/g, ""));
           }
         }
         if (contact.hasParam("pub-gruu")) {
           const gruu = contact.getParam("pub-gruu");
           if (gruu) {
-            this.userAgent.contact.pubGruu = Grammar.URIParse(gruu.replace(/"/g, ""));
+            this.userAgent.contact.pubGruu = exports.Grammar.URIParse(gruu.replace(/"/g, ""));
           }
         }
         this.registered(expires);
@@ -5619,12 +5621,12 @@ class Registerer {
    * Rejects with `RequestPendingError` if a REGISTER request is already in progress.
    */
   unregister(options = {}) {
-    if (this.state === RegistererState.Terminated) {
+    if (this.state === exports.RegistererState.Terminated) {
       this.stateError();
       throw new Error("Registerer terminated. Unable to register.");
     }
     if (this.disposed) {
-      if (this.state !== RegistererState.Registered) {
+      if (this.state !== exports.RegistererState.Registered) {
         this.stateError();
         throw new Error("Registerer disposed. Unable to register.");
       }
@@ -5634,7 +5636,7 @@ class Registerer {
       const error = new RequestPendingError("REGISTER request already in progress, waiting for final response");
       return Promise.reject(error);
     }
-    if (this._state !== RegistererState.Registered && !options.all) {
+    if (this._state !== exports.RegistererState.Registered && !options.all) {
       this.logger.warn("Not currently registered, but sending an unregister anyway.");
     }
     const extraHeaders = (options.requestOptions && options.requestOptions.extraHeaders || []).slice();
@@ -5733,8 +5735,8 @@ class Registerer {
       this.logger.warn("Registration expired");
       this.unregistered();
     }, expires * 1e3);
-    if (this._state !== RegistererState.Registered) {
-      this.stateTransition(RegistererState.Registered);
+    if (this._state !== exports.RegistererState.Registered) {
+      this.stateTransition(exports.RegistererState.Registered);
     }
   }
   /**
@@ -5742,8 +5744,8 @@ class Registerer {
    */
   unregistered() {
     this.clearTimers();
-    if (this._state !== RegistererState.Unregistered) {
-      this.stateTransition(RegistererState.Unregistered);
+    if (this._state !== exports.RegistererState.Unregistered) {
+      this.stateTransition(exports.RegistererState.Unregistered);
     }
   }
   /**
@@ -5751,8 +5753,8 @@ class Registerer {
    */
   terminated() {
     this.clearTimers();
-    if (this._state !== RegistererState.Terminated) {
-      this.stateTransition(RegistererState.Terminated);
+    if (this._state !== exports.RegistererState.Terminated) {
+      this.stateTransition(exports.RegistererState.Terminated);
     }
   }
   /**
@@ -5763,22 +5765,22 @@ class Registerer {
       throw new Error(`Invalid state transition from ${this._state} to ${newState}`);
     };
     switch (this._state) {
-      case RegistererState.Initial:
-        if (newState !== RegistererState.Registered && newState !== RegistererState.Unregistered && newState !== RegistererState.Terminated) {
+      case exports.RegistererState.Initial:
+        if (newState !== exports.RegistererState.Registered && newState !== exports.RegistererState.Unregistered && newState !== exports.RegistererState.Terminated) {
           invalidTransition();
         }
         break;
-      case RegistererState.Registered:
-        if (newState !== RegistererState.Unregistered && newState !== RegistererState.Terminated) {
+      case exports.RegistererState.Registered:
+        if (newState !== exports.RegistererState.Unregistered && newState !== exports.RegistererState.Terminated) {
           invalidTransition();
         }
         break;
-      case RegistererState.Unregistered:
-        if (newState !== RegistererState.Registered && newState !== RegistererState.Terminated) {
+      case exports.RegistererState.Unregistered:
+        if (newState !== exports.RegistererState.Registered && newState !== exports.RegistererState.Terminated) {
           invalidTransition();
         }
         break;
-      case RegistererState.Terminated:
+      case exports.RegistererState.Terminated:
         invalidTransition();
         break;
       default:
@@ -5787,7 +5789,7 @@ class Registerer {
     this._state = newState;
     this.logger.log(`Registration transitioned to state ${this._state}`);
     this._stateEventEmitter.emit(this._state);
-    if (newState === RegistererState.Terminated) {
+    if (newState === exports.RegistererState.Terminated) {
       this.dispose();
     }
   }
@@ -5821,7 +5823,7 @@ class Registerer {
   }
   /** Hopefully helpful as the standard behavior has been found to be unexpected. */
   stateError() {
-    const reason = this.state === RegistererState.Terminated ? "is in 'Terminated' state" : "has been disposed";
+    const reason = this.state === exports.RegistererState.Terminated ? "is in 'Terminated' state" : "has been disposed";
     let message = `An attempt was made to send a REGISTER request when the Registerer ${reason}.`;
     message += " The Registerer transitions to 'Terminated' when Registerer.dispose() is called.";
     message += " Perhaps you called UserAgent.stop() which dipsoses of all Registerers?";
@@ -5830,21 +5832,21 @@ class Registerer {
 }
 Registerer.defaultExpires = 600;
 Registerer.defaultRefreshFrequency = 99;
-var SubscriptionState$1;
+var SubscriptionState;
 (function(SubscriptionState2) {
   SubscriptionState2["Initial"] = "Initial";
   SubscriptionState2["NotifyWait"] = "NotifyWait";
   SubscriptionState2["Pending"] = "Pending";
   SubscriptionState2["Active"] = "Active";
   SubscriptionState2["Terminated"] = "Terminated";
-})(SubscriptionState$1 = SubscriptionState$1 || (SubscriptionState$1 = {}));
-var SubscriptionState;
+})(SubscriptionState = SubscriptionState || (SubscriptionState = {}));
+exports.SubscriptionState = void 0;
 (function(SubscriptionState2) {
   SubscriptionState2["Initial"] = "Initial";
   SubscriptionState2["NotifyWait"] = "NotifyWait";
   SubscriptionState2["Subscribed"] = "Subscribed";
   SubscriptionState2["Terminated"] = "Terminated";
-})(SubscriptionState = SubscriptionState || (SubscriptionState = {}));
+})(exports.SubscriptionState = exports.SubscriptionState || (exports.SubscriptionState = {}));
 class Subscription {
   /**
    * Constructor.
@@ -5853,7 +5855,7 @@ class Subscription {
    */
   constructor(userAgent, options = {}) {
     this._disposed = false;
-    this._state = SubscriptionState.Initial;
+    this._state = exports.SubscriptionState.Initial;
     this._logger = userAgent.getLogger("sip.Subscription");
     this._stateEventEmitter = new EmitterImpl();
     this._userAgent = userAgent;
@@ -5901,22 +5903,22 @@ class Subscription {
       throw new Error(`Invalid state transition from ${this._state} to ${newState}`);
     };
     switch (this._state) {
-      case SubscriptionState.Initial:
-        if (newState !== SubscriptionState.NotifyWait && newState !== SubscriptionState.Terminated) {
+      case exports.SubscriptionState.Initial:
+        if (newState !== exports.SubscriptionState.NotifyWait && newState !== exports.SubscriptionState.Terminated) {
           invalidTransition();
         }
         break;
-      case SubscriptionState.NotifyWait:
-        if (newState !== SubscriptionState.Subscribed && newState !== SubscriptionState.Terminated) {
+      case exports.SubscriptionState.NotifyWait:
+        if (newState !== exports.SubscriptionState.Subscribed && newState !== exports.SubscriptionState.Terminated) {
           invalidTransition();
         }
         break;
-      case SubscriptionState.Subscribed:
-        if (newState !== SubscriptionState.Terminated) {
+      case exports.SubscriptionState.Subscribed:
+        if (newState !== exports.SubscriptionState.Terminated) {
           invalidTransition();
         }
         break;
-      case SubscriptionState.Terminated:
+      case exports.SubscriptionState.Terminated:
         invalidTransition();
         break;
       default:
@@ -5928,7 +5930,7 @@ class Subscription {
     this._state = newState;
     this._logger.log(`Subscription ${this._dialog ? this._dialog.id : void 0} transitioned to ${this._state}`);
     this._stateEventEmitter.emit(this._state);
-    if (newState === SubscriptionState.Terminated) {
+    if (newState === exports.SubscriptionState.Terminated) {
       this.dispose();
     }
   }
@@ -5983,13 +5985,13 @@ class Subscriber extends Subscription {
     }
     this.subscriberRequest.dispose();
     return super.dispose().then(() => {
-      if (this.state !== SubscriptionState.Subscribed) {
+      if (this.state !== exports.SubscriptionState.Subscribed) {
         return;
       }
       if (!this._dialog) {
         throw new Error("Dialog undefined.");
       }
-      if (this._dialog.subscriptionState === SubscriptionState$1.Pending || this._dialog.subscriptionState === SubscriptionState$1.Active) {
+      if (this._dialog.subscriptionState === SubscriptionState.Pending || this._dialog.subscriptionState === SubscriptionState.Active) {
         const dialog = this._dialog;
         return new Promise((resolve, reject) => {
           dialog.delegate = {
@@ -6010,9 +6012,9 @@ class Subscriber extends Subscription {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   subscribe(options = {}) {
     switch (this.subscriberRequest.state) {
-      case SubscriptionState$1.Initial:
-        if (this.state === SubscriptionState.Initial) {
-          this.stateTransition(SubscriptionState.NotifyWait);
+      case SubscriptionState.Initial:
+        if (this.state === exports.SubscriptionState.Initial) {
+          this.stateTransition(exports.SubscriptionState.NotifyWait);
         }
         this.subscriberRequest.subscribe().then((result) => {
           if (result.success) {
@@ -6022,8 +6024,8 @@ class Subscriber extends Subscription {
                 onNotify: (request) => this.onNotify(request),
                 onRefresh: (request) => this.onRefresh(request),
                 onTerminated: () => {
-                  if (this.state !== SubscriptionState.Terminated) {
-                    this.stateTransition(SubscriptionState.Terminated);
+                  if (this.state !== exports.SubscriptionState.Terminated) {
+                    this.stateTransition(exports.SubscriptionState.Terminated);
                   }
                 }
               };
@@ -6034,11 +6036,11 @@ class Subscriber extends Subscription {
           }
         });
         break;
-      case SubscriptionState$1.NotifyWait:
+      case SubscriptionState.NotifyWait:
         break;
-      case SubscriptionState$1.Pending:
+      case SubscriptionState.Pending:
         break;
-      case SubscriptionState$1.Active:
+      case SubscriptionState.Active:
         if (this._dialog) {
           const request = this._dialog.refresh();
           request.delegate = {
@@ -6050,7 +6052,7 @@ class Subscriber extends Subscription {
           };
         }
         break;
-      case SubscriptionState$1.Terminated:
+      case SubscriptionState.Terminated:
         break;
     }
     return Promise.resolve();
@@ -6064,26 +6066,26 @@ class Subscriber extends Subscription {
       return Promise.resolve();
     }
     switch (this.subscriberRequest.state) {
-      case SubscriptionState$1.Initial:
+      case SubscriptionState.Initial:
         break;
-      case SubscriptionState$1.NotifyWait:
+      case SubscriptionState.NotifyWait:
         break;
-      case SubscriptionState$1.Pending:
+      case SubscriptionState.Pending:
         if (this._dialog) {
           this._dialog.unsubscribe();
         }
         break;
-      case SubscriptionState$1.Active:
+      case SubscriptionState.Active:
         if (this._dialog) {
           this._dialog.unsubscribe();
         }
         break;
-      case SubscriptionState$1.Terminated:
+      case SubscriptionState.Terminated:
         break;
       default:
         throw new Error("Unknown state.");
     }
-    this.stateTransition(SubscriptionState.Terminated);
+    this.stateTransition(exports.SubscriptionState.Terminated);
     return Promise.resolve();
   }
   /**
@@ -6092,7 +6094,7 @@ class Subscriber extends Subscription {
    * @internal
    */
   _refresh() {
-    if (this.subscriberRequest.state === SubscriptionState$1.Active) {
+    if (this.subscriberRequest.state === SubscriptionState.Active) {
       return this.subscribe();
     }
     return Promise.resolve();
@@ -6107,8 +6109,8 @@ class Subscriber extends Subscription {
       request.accept();
       return;
     }
-    if (this.state !== SubscriptionState.Subscribed) {
-      this.stateTransition(SubscriptionState.Subscribed);
+    if (this.state !== exports.SubscriptionState.Subscribed) {
+      this.stateTransition(exports.SubscriptionState.Subscribed);
     }
     if (this.delegate && this.delegate.onNotify) {
       const notification = new Notification(request);
@@ -6195,9 +6197,9 @@ class SubscriberRequest {
     if (this.subscription) {
       return this.subscription.subscriptionState;
     } else if (this.subscribed) {
-      return SubscriptionState$1.NotifyWait;
+      return SubscriptionState.NotifyWait;
     } else {
-      return SubscriptionState$1.Initial;
+      return SubscriptionState.Initial;
     }
   }
   /**
@@ -6261,18 +6263,18 @@ class SubscriberRequest {
     });
   }
 }
-var TransportState;
-(function(TransportState2) {
-  TransportState2["Connecting"] = "Connecting";
-  TransportState2["Connected"] = "Connected";
-  TransportState2["Disconnecting"] = "Disconnecting";
-  TransportState2["Disconnected"] = "Disconnected";
-})(TransportState = TransportState || (TransportState = {}));
-var UserAgentState;
-(function(UserAgentState2) {
-  UserAgentState2["Started"] = "Started";
-  UserAgentState2["Stopped"] = "Stopped";
-})(UserAgentState = UserAgentState || (UserAgentState = {}));
+exports.TransportState = void 0;
+(function(TransportState) {
+  TransportState["Connecting"] = "Connecting";
+  TransportState["Connected"] = "Connected";
+  TransportState["Disconnecting"] = "Disconnecting";
+  TransportState["Disconnected"] = "Disconnected";
+})(exports.TransportState = exports.TransportState || (exports.TransportState = {}));
+exports.UserAgentState = void 0;
+(function(UserAgentState) {
+  UserAgentState["Started"] = "Started";
+  UserAgentState["Stopped"] = "Stopped";
+})(exports.UserAgentState = exports.UserAgentState || (exports.UserAgentState = {}));
 class Md5 {
   constructor() {
     this._dataLength = 0;
@@ -6899,7 +6901,7 @@ var Parser;
         }
         break;
       case "record-route":
-        parsed = Grammar.parse(headerValue, "Record_Route");
+        parsed = exports.Grammar.parse(headerValue, "Record_Route");
         if (parsed === -1) {
           parsed = void 0;
           break;
@@ -6923,7 +6925,7 @@ var Parser;
         break;
       case "contact":
       case "m":
-        parsed = Grammar.parse(headerValue, "Contact");
+        parsed = exports.Grammar.parse(headerValue, "Contact");
         if (parsed === -1) {
           parsed = void 0;
           break;
@@ -6998,7 +7000,7 @@ var Parser;
       return;
     }
     const firstLine = data.substring(0, headerEnd);
-    const parsed = Grammar.parse(firstLine, "Request_Response");
+    const parsed = exports.Grammar.parse(firstLine, "Request_Response");
     let message;
     if (parsed === -1) {
       logger.warn('error parsing first line of SIP message: "' + firstLine + '"');
@@ -9245,13 +9247,13 @@ class SessionDialog extends Dialog {
   // FIXME: Need real state machine
   get sessionState() {
     if (this.early) {
-      return SessionState$1.Early;
+      return SessionState.Early;
     } else if (this.ackWait) {
-      return SessionState$1.AckWait;
+      return SessionState.AckWait;
     } else if (this._signalingState === SignalingState.Closed) {
-      return SessionState$1.Terminated;
+      return SessionState.Terminated;
     } else {
-      return SessionState$1.Confirmed;
+      return SessionState.Confirmed;
     }
   }
   /** The state of the offer/answer exchange. */
@@ -10342,7 +10344,7 @@ class SubscriptionDialog extends Dialog {
    */
   subscribe(delegate, options = {}) {
     var _a;
-    if (this.subscriptionState !== SubscriptionState$1.Pending && this.subscriptionState !== SubscriptionState$1.Active) {
+    if (this.subscriptionState !== SubscriptionState.Pending && this.subscriptionState !== SubscriptionState.Active) {
       throw new Error(`Invalid state ${this.subscriptionState}. May only re-subscribe while in state "pending" or "active".`);
     }
     this.logger.log(`SUBSCRIBE dialog ${this.id} sending SUBSCRIBE request`);
@@ -10364,7 +10366,7 @@ class SubscriptionDialog extends Dialog {
    * https://tools.ietf.org/html/rfc6665#section-4.4.1
    */
   terminate() {
-    this.stateTransition(SubscriptionState$1.Terminated);
+    this.stateTransition(SubscriptionState.Terminated);
     this.onTerminated();
   }
   /**
@@ -10405,13 +10407,13 @@ class SubscriptionDialog extends Dialog {
     const expires = subscriptionState.expires ? Math.max(subscriptionState.expires, 0) : void 0;
     switch (state) {
       case "pending":
-        this.stateTransition(SubscriptionState$1.Pending, expires);
+        this.stateTransition(SubscriptionState.Pending, expires);
         break;
       case "active":
-        this.stateTransition(SubscriptionState$1.Active, expires);
+        this.stateTransition(SubscriptionState.Active, expires);
         break;
       case "terminated":
-        this.stateTransition(SubscriptionState$1.Terminated, expires);
+        this.stateTransition(SubscriptionState.Terminated, expires);
         break;
       default:
         this.logger.warn("Unrecognized subscription state.");
@@ -10459,26 +10461,26 @@ class SubscriptionDialog extends Dialog {
       this.logger.warn(`Invalid subscription state transition from ${this.subscriptionState} to ${newState}`);
     };
     switch (newState) {
-      case SubscriptionState$1.Initial:
+      case SubscriptionState.Initial:
         invalidStateTransition();
         return;
-      case SubscriptionState$1.NotifyWait:
+      case SubscriptionState.NotifyWait:
         invalidStateTransition();
         return;
-      case SubscriptionState$1.Pending:
-        if (this.subscriptionState !== SubscriptionState$1.NotifyWait && this.subscriptionState !== SubscriptionState$1.Pending) {
+      case SubscriptionState.Pending:
+        if (this.subscriptionState !== SubscriptionState.NotifyWait && this.subscriptionState !== SubscriptionState.Pending) {
           invalidStateTransition();
           return;
         }
         break;
-      case SubscriptionState$1.Active:
-        if (this.subscriptionState !== SubscriptionState$1.NotifyWait && this.subscriptionState !== SubscriptionState$1.Pending && this.subscriptionState !== SubscriptionState$1.Active) {
+      case SubscriptionState.Active:
+        if (this.subscriptionState !== SubscriptionState.NotifyWait && this.subscriptionState !== SubscriptionState.Pending && this.subscriptionState !== SubscriptionState.Active) {
           invalidStateTransition();
           return;
         }
         break;
-      case SubscriptionState$1.Terminated:
-        if (this.subscriptionState !== SubscriptionState$1.NotifyWait && this.subscriptionState !== SubscriptionState$1.Pending && this.subscriptionState !== SubscriptionState$1.Active) {
+      case SubscriptionState.Terminated:
+        if (this.subscriptionState !== SubscriptionState.NotifyWait && this.subscriptionState !== SubscriptionState.Pending && this.subscriptionState !== SubscriptionState.Active) {
           invalidStateTransition();
           return;
         }
@@ -10487,17 +10489,17 @@ class SubscriptionDialog extends Dialog {
         invalidStateTransition();
         return;
     }
-    if (newState === SubscriptionState$1.Pending) {
+    if (newState === SubscriptionState.Pending) {
       if (newExpires) {
         this.subscriptionExpires = newExpires;
       }
     }
-    if (newState === SubscriptionState$1.Active) {
+    if (newState === SubscriptionState.Active) {
       if (newExpires) {
         this.subscriptionExpires = newExpires;
       }
     }
-    if (newState === SubscriptionState$1.Terminated) {
+    if (newState === SubscriptionState.Terminated) {
       this.dispose();
     }
     this._subscriptionState = newState;
@@ -10515,8 +10517,8 @@ class SubscriptionDialog extends Dialog {
    */
   timerN() {
     this.logger.warn(`Timer N expired for SUBSCRIBE dialog. Timed out waiting for NOTIFY.`);
-    if (this.subscriptionState !== SubscriptionState$1.Terminated) {
-      this.stateTransition(SubscriptionState$1.Terminated);
+    if (this.subscriptionState !== SubscriptionState.Terminated) {
+      this.stateTransition(SubscriptionState.Terminated);
       this.onTerminated();
     }
   }
@@ -10536,7 +10538,7 @@ class SubscribeUserAgentClient extends UserAgentClient {
     this.subscriberId = message.callId + message.fromTag + event;
     this.subscriptionExpiresRequested = this.subscriptionExpires = Number(expires);
     this.subscriptionEvent = event;
-    this.subscriptionState = SubscriptionState$1.NotifyWait;
+    this.subscriptionState = SubscriptionState.NotifyWait;
     this.waitNotifyStart();
   }
   /**
@@ -10597,18 +10599,18 @@ class SubscribeUserAgentClient extends UserAgentClient {
     this.subscriptionExpires = subscriptionState.expires ? Math.min(this.subscriptionExpires, Math.max(subscriptionState.expires, 0)) : this.subscriptionExpires;
     switch (state) {
       case "pending":
-        this.subscriptionState = SubscriptionState$1.Pending;
+        this.subscriptionState = SubscriptionState.Pending;
         break;
       case "active":
-        this.subscriptionState = SubscriptionState$1.Active;
+        this.subscriptionState = SubscriptionState.Active;
         break;
       case "terminated":
-        this.subscriptionState = SubscriptionState$1.Terminated;
+        this.subscriptionState = SubscriptionState.Terminated;
         break;
       default:
         throw new Error(`Unrecognized state ${state}.`);
     }
-    if (this.subscriptionState !== SubscriptionState$1.Terminated) {
+    if (this.subscriptionState !== SubscriptionState.Terminated) {
       const dialogState = SubscriptionDialog.initialDialogStateForSubscription(this.message, uas.message);
       this.dialog = new SubscriptionDialog(this.subscriptionEvent, this.subscriptionExpires, this.subscriptionState, this.core, dialogState);
     }
@@ -11902,7 +11904,7 @@ function defaultSessionDescriptionHandlerFactory(mediaStreamFactory) {
 }
 class Transport {
   constructor(logger, options) {
-    this._state = TransportState.Disconnected;
+    this._state = exports.TransportState.Disconnected;
     this.transitioningState = false;
     this._stateEventEmitter = new EmitterImpl();
     this.logger = logger;
@@ -11929,7 +11931,7 @@ class Transport {
     }
     this.configuration = Object.assign(Object.assign({}, Transport.defaultOptions), options);
     const url = this.configuration.server;
-    const parsed = Grammar.parse(url, "absoluteURI");
+    const parsed = exports.Grammar.parse(url, "absoluteURI");
     if (parsed === -1) {
       this.logger.error(`Invalid WebSocket Server URL "${url}"`);
       throw new Error("Invalid WebSocket Server URL");
@@ -11997,7 +11999,7 @@ class Transport {
    * This is equivalent to `state === TransportState.Connected`.
    */
   isConnected() {
-    return this.state === TransportState.Connected;
+    return this.state === exports.TransportState.Connected;
   }
   /**
    * Sends a message.
@@ -12010,28 +12012,28 @@ class Transport {
   _connect() {
     this.logger.log(`Connecting ${this.server}`);
     switch (this.state) {
-      case TransportState.Connecting:
+      case exports.TransportState.Connecting:
         if (this.transitioningState) {
-          return Promise.reject(this.transitionLoopDetectedError(TransportState.Connecting));
+          return Promise.reject(this.transitionLoopDetectedError(exports.TransportState.Connecting));
         }
         if (!this.connectPromise) {
           throw new Error("Connect promise must be defined.");
         }
         return this.connectPromise;
-      case TransportState.Connected:
+      case exports.TransportState.Connected:
         if (this.transitioningState) {
-          return Promise.reject(this.transitionLoopDetectedError(TransportState.Connecting));
+          return Promise.reject(this.transitionLoopDetectedError(exports.TransportState.Connecting));
         }
         if (this.connectPromise) {
           throw new Error("Connect promise must not be defined.");
         }
         return Promise.resolve();
-      case TransportState.Disconnecting:
+      case exports.TransportState.Disconnecting:
         if (this.connectPromise) {
           throw new Error("Connect promise must not be defined.");
         }
         try {
-          this.transitionState(TransportState.Connecting);
+          this.transitionState(exports.TransportState.Connecting);
         } catch (e) {
           if (e instanceof StateTransitionError) {
             return Promise.reject(e);
@@ -12039,12 +12041,12 @@ class Transport {
           throw e;
         }
         break;
-      case TransportState.Disconnected:
+      case exports.TransportState.Disconnected:
         if (this.connectPromise) {
           throw new Error("Connect promise must not be defined.");
         }
         try {
-          this.transitionState(TransportState.Connecting);
+          this.transitionState(exports.TransportState.Connecting);
         } catch (e) {
           if (e instanceof StateTransitionError) {
             return Promise.reject(e);
@@ -12071,7 +12073,7 @@ class Transport {
       return new Promise((resolve, reject) => {
         this.connectResolve = resolve;
         this.connectReject = reject;
-        this.transitionState(TransportState.Disconnected, error);
+        this.transitionState(exports.TransportState.Disconnected, error);
       });
     }
     this.connectPromise = new Promise((resolve, reject) => {
@@ -12087,12 +12089,12 @@ class Transport {
   _disconnect() {
     this.logger.log(`Disconnecting ${this.server}`);
     switch (this.state) {
-      case TransportState.Connecting:
+      case exports.TransportState.Connecting:
         if (this.disconnectPromise) {
           throw new Error("Disconnect promise must not be defined.");
         }
         try {
-          this.transitionState(TransportState.Disconnecting);
+          this.transitionState(exports.TransportState.Disconnecting);
         } catch (e) {
           if (e instanceof StateTransitionError) {
             return Promise.reject(e);
@@ -12100,12 +12102,12 @@ class Transport {
           throw e;
         }
         break;
-      case TransportState.Connected:
+      case exports.TransportState.Connected:
         if (this.disconnectPromise) {
           throw new Error("Disconnect promise must not be defined.");
         }
         try {
-          this.transitionState(TransportState.Disconnecting);
+          this.transitionState(exports.TransportState.Disconnecting);
         } catch (e) {
           if (e instanceof StateTransitionError) {
             return Promise.reject(e);
@@ -12113,17 +12115,17 @@ class Transport {
           throw e;
         }
         break;
-      case TransportState.Disconnecting:
+      case exports.TransportState.Disconnecting:
         if (this.transitioningState) {
-          return Promise.reject(this.transitionLoopDetectedError(TransportState.Disconnecting));
+          return Promise.reject(this.transitionLoopDetectedError(exports.TransportState.Disconnecting));
         }
         if (!this.disconnectPromise) {
           throw new Error("Disconnect promise must be defined.");
         }
         return this.disconnectPromise;
-      case TransportState.Disconnected:
+      case exports.TransportState.Disconnected:
         if (this.transitioningState) {
-          return Promise.reject(this.transitionLoopDetectedError(TransportState.Disconnecting));
+          return Promise.reject(this.transitionLoopDetectedError(exports.TransportState.Disconnecting));
         }
         if (this.disconnectPromise) {
           throw new Error("Disconnect promise must not be defined.");
@@ -12153,7 +12155,7 @@ class Transport {
     if (this.configuration.traceSip === true) {
       this.logger.log("Sending WebSocket message:\n\n" + message + "\n");
     }
-    if (this._state !== TransportState.Connected) {
+    if (this._state !== exports.TransportState.Connected) {
       return Promise.reject(new Error("Not connected."));
     }
     if (!this._ws) {
@@ -12184,7 +12186,7 @@ class Transport {
     }
     this.logger.log(message);
     this._ws = void 0;
-    this.transitionState(TransportState.Disconnected, error);
+    this.transitionState(exports.TransportState.Disconnected, error);
   }
   /**
    * WebSocket "onerror" event handler.
@@ -12234,7 +12236,7 @@ class Transport {
         this.logger.log("Received WebSocket text message:\n\n" + finishedData + "\n");
       }
     }
-    if (this.state !== TransportState.Connected) {
+    if (this.state !== exports.TransportState.Connected) {
       this.logger.warn("Received message while not connected, discarding...");
       return;
     }
@@ -12256,9 +12258,9 @@ class Transport {
     if (ws !== this._ws) {
       return;
     }
-    if (this._state === TransportState.Connecting) {
+    if (this._state === exports.TransportState.Connecting) {
       this.logger.log(`WebSocket opened ${this.server}`);
-      this.transitionState(TransportState.Connected);
+      this.transitionState(exports.TransportState.Connected);
     }
   }
   /**
@@ -12285,23 +12287,23 @@ class Transport {
     }
     this.transitioningState = true;
     switch (this._state) {
-      case TransportState.Connecting:
-        if (newState !== TransportState.Connected && newState !== TransportState.Disconnecting && newState !== TransportState.Disconnected) {
+      case exports.TransportState.Connecting:
+        if (newState !== exports.TransportState.Connected && newState !== exports.TransportState.Disconnecting && newState !== exports.TransportState.Disconnected) {
           invalidTransition();
         }
         break;
-      case TransportState.Connected:
-        if (newState !== TransportState.Disconnecting && newState !== TransportState.Disconnected) {
+      case exports.TransportState.Connected:
+        if (newState !== exports.TransportState.Disconnecting && newState !== exports.TransportState.Disconnected) {
           invalidTransition();
         }
         break;
-      case TransportState.Disconnecting:
-        if (newState !== TransportState.Connecting && newState !== TransportState.Disconnected) {
+      case exports.TransportState.Disconnecting:
+        if (newState !== exports.TransportState.Connecting && newState !== exports.TransportState.Disconnected) {
           invalidTransition();
         }
         break;
-      case TransportState.Disconnected:
-        if (newState !== TransportState.Connecting) {
+      case exports.TransportState.Disconnected:
+        if (newState !== exports.TransportState.Connecting) {
           invalidTransition();
         }
         break;
@@ -12312,14 +12314,14 @@ class Transport {
     this._state = newState;
     const connectResolve = this.connectResolve;
     const connectReject = this.connectReject;
-    if (oldState === TransportState.Connecting) {
+    if (oldState === exports.TransportState.Connecting) {
       this.connectPromise = void 0;
       this.connectResolve = void 0;
       this.connectReject = void 0;
     }
     const disconnectResolve = this.disconnectResolve;
     const disconnectReject = this.disconnectReject;
-    if (oldState === TransportState.Disconnecting) {
+    if (oldState === exports.TransportState.Disconnecting) {
       this.disconnectPromise = void 0;
       this.disconnectResolve = void 0;
       this.disconnectReject = void 0;
@@ -12330,7 +12332,7 @@ class Transport {
     }
     this.logger.log(`Transitioned from ${oldState} to ${this._state}`);
     this._stateEventEmitter.emit(this._state);
-    if (newState === TransportState.Connected) {
+    if (newState === exports.TransportState.Connected) {
       this.startSendingKeepAlives();
       if (this.onConnect) {
         try {
@@ -12342,7 +12344,7 @@ class Transport {
         }
       }
     }
-    if (oldState === TransportState.Connected) {
+    if (oldState === exports.TransportState.Connected) {
       this.stopSendingKeepAlives();
       if (this.onDisconnect) {
         try {
@@ -12358,23 +12360,23 @@ class Transport {
         }
       }
     }
-    if (oldState === TransportState.Connecting) {
+    if (oldState === exports.TransportState.Connecting) {
       if (!connectResolve) {
         throw new Error("Connect resolve undefined.");
       }
       if (!connectReject) {
         throw new Error("Connect reject undefined.");
       }
-      newState === TransportState.Connected ? connectResolve() : connectReject(error || new Error("Connect aborted."));
+      newState === exports.TransportState.Connected ? connectResolve() : connectReject(error || new Error("Connect aborted."));
     }
-    if (oldState === TransportState.Disconnecting) {
+    if (oldState === exports.TransportState.Disconnecting) {
       if (!disconnectResolve) {
         throw new Error("Disconnect resolve undefined.");
       }
       if (!disconnectReject) {
         throw new Error("Disconnect reject undefined.");
       }
-      newState === TransportState.Disconnected ? disconnectResolve() : disconnectReject(error || new Error("Disconnect aborted."));
+      newState === exports.TransportState.Disconnected ? disconnectResolve() : disconnectReject(error || new Error("Disconnect aborted."));
     }
     this.transitioningState = false;
   }
@@ -12466,7 +12468,7 @@ class UserAgent {
     this._registerers = {};
     this._sessions = {};
     this._subscriptions = {};
-    this._state = UserAgentState.Stopped;
+    this._state = exports.UserAgentState.Stopped;
     this._stateEventEmitter = new EmitterImpl();
     this.delegate = options.delegate;
     this.options = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, UserAgent.defaultOptions()), { sipjsId: createRandomToken(5) }), { uri: new URI("sip", "anonymous." + createRandomToken(6), "anonymous.invalid") }), { viaHost: createRandomToken(12) + ".invalid" }), UserAgent.stripUndefinedProperties(options));
@@ -12549,7 +12551,7 @@ class UserAgent {
     this.initTransportCallbacks();
     this._contact = this.initContact();
     this._instanceId = this.options.instanceId ? this.options.instanceId : UserAgent.newUUID();
-    if (Grammar.parse(this._instanceId, "uuid") === -1) {
+    if (exports.Grammar.parse(this._instanceId, "uuid") === -1) {
       throw new Error("Invalid instanceId.");
     }
     this._userAgentCore = this.initCore();
@@ -12570,7 +12572,7 @@ class UserAgent {
    * ```
    */
   static makeURI(uri) {
-    return Grammar.URIParse(uri);
+    return exports.Grammar.URIParse(uri);
   }
   /** Default user agent options. */
   static defaultOptions() {
@@ -12602,8 +12604,8 @@ class UserAgent {
       sendInitialProvisionalResponse: true,
       sessionDescriptionHandlerFactory: defaultSessionDescriptionHandlerFactory(),
       sessionDescriptionHandlerFactoryOptions: {},
-      sipExtension100rel: SIPExtension.Unsupported,
-      sipExtensionReplaces: SIPExtension.Unsupported,
+      sipExtension100rel: exports.SIPExtension.Unsupported,
+      sipExtensionReplaces: exports.SIPExtension.Unsupported,
       sipExtensionExtraSupported: [],
       sipjsId: "",
       transportConstructor: Transport,
@@ -12700,7 +12702,7 @@ class UserAgent {
    * Reconnect the transport.
    */
   reconnect() {
-    if (this.state === UserAgentState.Stopped) {
+    if (this.state === exports.UserAgentState.Stopped) {
       return Promise.reject(new Error("User agent stopped."));
     }
     return Promise.resolve().then(() => this.transport.connect());
@@ -12724,12 +12726,12 @@ class UserAgent {
    * ```
    */
   start() {
-    if (this.state === UserAgentState.Started) {
+    if (this.state === exports.UserAgentState.Started) {
       this.logger.warn(`User agent already started`);
       return Promise.resolve();
     }
     this.logger.log(`Starting ${this.configuration.uri}`);
-    this.transitionState(UserAgentState.Started);
+    this.transitionState(exports.UserAgentState.Started);
     return this.transport.connect();
   }
   /**
@@ -12764,7 +12766,7 @@ class UserAgent {
    * not wait for the Promise returned by `stop()` to complete.
    */
   async stop() {
-    if (this.state === UserAgentState.Stopped) {
+    if (this.state === exports.UserAgentState.Stopped) {
       this.logger.warn(`User agent already stopped`);
       return Promise.resolve();
     }
@@ -12781,7 +12783,7 @@ class UserAgent {
       this._registerers = {};
       this._sessions = {};
       this._subscriptions = {};
-      this.transitionState(UserAgentState.Stopped);
+      this.transitionState(exports.UserAgentState.Stopped);
       return Promise.resolve();
     }
     const publishers = Object.assign({}, this._publishers);
@@ -12837,7 +12839,7 @@ class UserAgent {
     });
     this.logger.log(`Dispose of core`);
     userAgentCore.dispose();
-    this.transitionState(UserAgentState.Stopped);
+    this.transitionState(exports.UserAgentState.Stopped);
   }
   /**
    * Used to avoid circular references.
@@ -12908,10 +12910,10 @@ class UserAgent {
   initCore() {
     let supportedOptionTags = [];
     supportedOptionTags.push("outbound");
-    if (this.options.sipExtension100rel === SIPExtension.Supported) {
+    if (this.options.sipExtension100rel === exports.SIPExtension.Supported) {
       supportedOptionTags.push("100rel");
     }
-    if (this.options.sipExtensionReplaces === SIPExtension.Supported) {
+    if (this.options.sipExtensionReplaces === exports.SIPExtension.Supported) {
       supportedOptionTags.push("replaces");
     }
     if (this.options.sipExtensionExtraSupported) {
@@ -12960,7 +12962,7 @@ class UserAgent {
           }
         };
         incomingInviteRequest.trying();
-        if (this.options.sipExtensionReplaces !== SIPExtension.Unsupported) {
+        if (this.options.sipExtensionReplaces !== exports.SIPExtension.Unsupported) {
           const message = incomingInviteRequest.message;
           const replaces = message.parseHeader("replaces");
           if (replaces) {
@@ -13062,7 +13064,7 @@ class UserAgent {
     this.transport.onMessage = (message) => this.onTransportMessage(message);
   }
   onTransportConnect() {
-    if (this.state === UserAgentState.Stopped) {
+    if (this.state === exports.UserAgentState.Stopped) {
       return;
     }
     if (this.delegate && this.delegate.onConnect) {
@@ -13070,7 +13072,7 @@ class UserAgent {
     }
   }
   onTransportDisconnect(error) {
-    if (this.state === UserAgentState.Stopped) {
+    if (this.state === exports.UserAgentState.Stopped) {
       return;
     }
     if (this.delegate && this.delegate.onDisconnect) {
@@ -13086,7 +13088,7 @@ class UserAgent {
       this.logger.warn("Failed to parse incoming message. Dropping.");
       return;
     }
-    if (this.state === UserAgentState.Stopped && message instanceof IncomingRequestMessage) {
+    if (this.state === exports.UserAgentState.Stopped && message instanceof IncomingRequestMessage) {
       this.logger.warn(`Received ${message.method} request while stopped. Dropping.`);
       return;
     }
@@ -13155,13 +13157,13 @@ class UserAgent {
       throw new Error(`Invalid state transition from ${this._state} to ${newState}`);
     };
     switch (this._state) {
-      case UserAgentState.Started:
-        if (newState !== UserAgentState.Stopped) {
+      case exports.UserAgentState.Started:
+        if (newState !== exports.UserAgentState.Stopped) {
           invalidTransition();
         }
         break;
-      case UserAgentState.Stopped:
-        if (newState !== UserAgentState.Started) {
+      case exports.UserAgentState.Stopped:
+        if (newState !== exports.UserAgentState.Started) {
           invalidTransition();
         }
         break;
@@ -13196,7 +13198,7 @@ const index$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePrope
   DigestAuthentication,
   Exception,
   get Grammar() {
-    return Grammar;
+    return exports.Grammar;
   },
   IncomingMessage,
   IncomingRequestMessage,
@@ -13238,7 +13240,7 @@ const index$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePrope
   ServerTransaction,
   SessionDialog,
   get SessionState() {
-    return SessionState$1;
+    return SessionState;
   },
   get SignalingState() {
     return SignalingState;
@@ -13247,7 +13249,7 @@ const index$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePrope
   SubscribeUserAgentServer,
   SubscriptionDialog,
   get SubscriptionState() {
-    return SubscriptionState$1;
+    return SubscriptionState;
   },
   Timers,
   Transaction,
@@ -13658,7 +13660,7 @@ class SessionManager {
       window.addEventListener("beforeunload", async () => {
         this.shouldBeConnected = false;
         this.shouldBeRegistered = false;
-        if (this.userAgent.state !== UserAgentState.Stopped) {
+        if (this.userAgent.state !== exports.UserAgentState.Stopped) {
           await this.userAgent.stop();
         }
       });
@@ -13752,7 +13754,7 @@ class SessionManager {
   async connect() {
     this.logger.log(`Connecting UserAgent...`);
     this.shouldBeConnected = true;
-    if (this.userAgent.state !== UserAgentState.Started) {
+    if (this.userAgent.state !== exports.UserAgentState.Started) {
       return this.userAgent.start();
     }
     return this.userAgent.reconnect();
@@ -13764,7 +13766,7 @@ class SessionManager {
    */
   async disconnect() {
     this.logger.log(`Disconnecting UserAgent...`);
-    if (this.userAgent.state === UserAgentState.Stopped) {
+    if (this.userAgent.state === exports.UserAgentState.Stopped) {
       return Promise.resolve();
     }
     this.shouldBeConnected = false;
@@ -13795,14 +13797,14 @@ class SessionManager {
       this.registerer = new Registerer(this.userAgent, this.registererOptions);
       this.registerer.stateChange.addListener((state) => {
         switch (state) {
-          case RegistererState.Initial:
+          case exports.RegistererState.Initial:
             break;
-          case RegistererState.Registered:
+          case exports.RegistererState.Registered:
             if (this.delegate && this.delegate.onRegistered) {
               this.delegate.onRegistered();
             }
             break;
-          case RegistererState.Unregistered:
+          case exports.RegistererState.Unregistered:
             if (this.delegate && this.delegate.onUnregistered) {
               this.delegate.onUnregistered();
             }
@@ -13810,7 +13812,7 @@ class SessionManager {
               this.attemptRegistration();
             }
             break;
-          case RegistererState.Terminated:
+          case exports.RegistererState.Terminated:
             break;
           default:
             throw new Error("Unknown registerer state.");
@@ -14176,7 +14178,7 @@ class SessionManager {
         this.logger.log(`User agent not connected`);
         return Promise.resolve();
       }
-      if (this.userAgent.state === UserAgentState.Stopped) {
+      if (this.userAgent.state === exports.UserAgentState.Stopped) {
         this.logger.log(`User agent stopped`);
         return Promise.resolve();
       }
@@ -14275,19 +14277,19 @@ class SessionManager {
     session.stateChange.addListener((state) => {
       this.logger.log(`[${session.id}] Session state changed to ${state}`);
       switch (state) {
-        case SessionState.Initial:
+        case exports.SessionState.Initial:
           break;
-        case SessionState.Establishing:
+        case exports.SessionState.Establishing:
           break;
-        case SessionState.Established:
+        case exports.SessionState.Established:
           this.setupLocalMedia(session);
           this.setupRemoteMedia(session);
           if (this.delegate && this.delegate.onCallAnswered) {
             this.delegate.onCallAnswered(session);
           }
           break;
-        case SessionState.Terminating:
-        case SessionState.Terminated:
+        case exports.SessionState.Terminating:
+        case exports.SessionState.Terminated:
           if (this.sessionExists(session)) {
             this.cleanupMedia(session);
             this.sessionRemove(session);
@@ -14542,7 +14544,7 @@ class SessionManager {
       this.logger.warn(`[${session.id}] A session is required to enabled/disable media tracks`);
       return;
     }
-    if (session.state !== SessionState.Established) {
+    if (session.state !== exports.SessionState.Established) {
       this.logger.warn(`[${session.id}] An established session is required to enable/disable media tracks`);
       return;
     }
@@ -14615,7 +14617,7 @@ class SessionManager {
   async terminate(session) {
     this.logger.log(`[${session.id}] Terminating...`);
     switch (session.state) {
-      case SessionState.Initial:
+      case exports.SessionState.Initial:
         if (session instanceof Inviter) {
           return session.cancel().then(() => {
             this.logger.log(`[${session.id}] Inviter never sent INVITE (canceled)`);
@@ -14627,7 +14629,7 @@ class SessionManager {
         } else {
           throw new Error("Unknown session type.");
         }
-      case SessionState.Establishing:
+      case exports.SessionState.Establishing:
         if (session instanceof Inviter) {
           return session.cancel().then(() => {
             this.logger.log(`[${session.id}] Inviter canceled (sent CANCEL)`);
@@ -14639,13 +14641,13 @@ class SessionManager {
         } else {
           throw new Error("Unknown session type.");
         }
-      case SessionState.Established:
+      case exports.SessionState.Established:
         return session.bye().then(() => {
           this.logger.log(`[${session.id}] Session ended (sent BYE)`);
         });
-      case SessionState.Terminating:
+      case exports.SessionState.Terminating:
         break;
-      case SessionState.Terminated:
+      case exports.SessionState.Terminated:
         break;
       default:
         throw new Error("Unknown state");
@@ -14987,44 +14989,34 @@ const index = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePropert
 }, Symbol.toStringTag, { value: "Module" }));
 const version = LIBRARY_VERSION;
 const name = "sip.js";
-export {
-  Ack,
-  Bye,
-  Cancel,
-  ContentTypeUnsupportedError,
-  index$1 as Core,
-  EmitterImpl,
-  Grammar,
-  Info,
-  Invitation,
-  Inviter,
-  Message,
-  Messager,
-  NameAddrHeader,
-  Notification,
-  Parameters,
-  Publisher,
-  PublisherState,
-  Referral,
-  Registerer,
-  RegistererState,
-  RequestPendingError,
-  SIPExtension,
-  Session,
-  SessionDescriptionHandlerError,
-  SessionState,
-  SessionTerminatedError,
-  StateTransitionError,
-  Subscriber,
-  Subscription,
-  SubscriptionState,
-  TransportState,
-  URI,
-  UserAgent,
-  UserAgentRegisteredOptionTags,
-  UserAgentState,
-  index as Web,
-  equivalentURI,
-  name,
-  version
-};
+exports.Ack = Ack;
+exports.Bye = Bye;
+exports.Cancel = Cancel;
+exports.ContentTypeUnsupportedError = ContentTypeUnsupportedError;
+exports.Core = index$1;
+exports.EmitterImpl = EmitterImpl;
+exports.Info = Info;
+exports.Invitation = Invitation;
+exports.Inviter = Inviter;
+exports.Message = Message;
+exports.Messager = Messager;
+exports.NameAddrHeader = NameAddrHeader;
+exports.Notification = Notification;
+exports.Parameters = Parameters;
+exports.Publisher = Publisher;
+exports.Referral = Referral;
+exports.Registerer = Registerer;
+exports.RequestPendingError = RequestPendingError;
+exports.Session = Session;
+exports.SessionDescriptionHandlerError = SessionDescriptionHandlerError;
+exports.SessionTerminatedError = SessionTerminatedError;
+exports.StateTransitionError = StateTransitionError;
+exports.Subscriber = Subscriber;
+exports.Subscription = Subscription;
+exports.URI = URI;
+exports.UserAgent = UserAgent;
+exports.UserAgentRegisteredOptionTags = UserAgentRegisteredOptionTags;
+exports.Web = index;
+exports.equivalentURI = equivalentURI;
+exports.name = name;
+exports.version = version;
