@@ -1,0 +1,53 @@
+lovelace:
+      # Available modes:
+      # - yaml: Use the UI editor in YAML mode
+      # - storage: Use the UI editor in storage mode
+      # - auto: Use the UI editor in YAML mode if a YAML file is found, otherwise use storage mode
+      # - disabled: Disable the UI editor
+      mode: storage
+      dashboards:
+        lovelace-main:
+          mode: yaml
+          filename: ui-lovelace.yaml
+          title: Main Dashboard
+          icon: mdi:home
+          show_in_sidebar: true
+
+# Basic configuration
+homeassistant:
+  name: Development
+  latitude: 0
+  longitude: 0
+  elevation: 0
+  unit_system: metric
+  time_zone: Africa/Kigali
+
+# Enable frontend development tools
+frontend:
+  themes: !include_dir_merge_named themes
+  extra_module_url:
+    - /local/community/ha-webrtc-sip-card/ha-webrtc-sip-card.js
+    - /local/community/ha-webrtc-sip-card/ha-webrtc-sip-card-editor.js
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.16.0.0/12    # Docker network range
+    - 172.17.0.0/16    # Docker bridge network
+    - 172.18.0.0/16    # Docker compose network
+
+
+# Enable configuration UI
+config:
+
+# Enable system health
+system_health:
+
+# Enable Home Assistant iOS app support
+mobile_app:
+
+# Enable energy dashboard
+energy:
+
+# Demo entities for testing
+demo:

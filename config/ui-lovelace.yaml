@@ -1,0 +1,6 @@
+title: Development Dashboard
+views:
+  - path: default_view
+    title: Test Cards
+    cards:
+      - type: custom:ha-webrtc-sip-card
