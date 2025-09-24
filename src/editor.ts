@@ -59,22 +59,9 @@ export class WebRTCSipCardEditor extends LitElement {
           @input="${this._stunServersChanged}"
         ></ha-textfield>
 
-        <ha-textfield
-          label="Ring Timeout (ms)"
-          type="number"
-          .value="${this._config.ring_timeout || DEFAULT_CONFIG.ring_timeout}"
-          .configValue="${"ring_timeout"}"
-          @input="${this._valueChanged}"
-        ></ha-textfield>
-
         <div class="switch-container">
           <label class="switch-label">Use Secure Connection</label>
           <ha-switch .checked="${this._config.use_secure !== false}" .configValue="${"use_secure"}" @change="${this._valueChanged}"></ha-switch>
-        </div>
-
-        <div class="switch-container">
-          <label class="switch-label">Auto Answer</label>
-          <ha-switch .checked="${this._config.auto_answer === true}" .configValue="${"auto_answer"}" @change="${this._valueChanged}"></ha-switch>
         </div>
 
         <div class="switch-container">
@@ -88,11 +75,6 @@ export class WebRTCSipCardEditor extends LitElement {
         </div>
 
         <div class="switch-container">
-          <label class="switch-label">Call History Enabled</label>
-          <ha-switch .checked="${this._config.call_history_enabled !== false}" .configValue="${"call_history_enabled"}" @change="${this._valueChanged}"></ha-switch>
-        </div>
-
-        <div class="switch-container">
           <label class="switch-label">Debug Mode</label>
           <ha-switch .checked="${this._config.debug === true}" .configValue="${"debug"}" @change="${this._valueChanged}"></ha-switch>
         </div>
@@ -100,24 +82,6 @@ export class WebRTCSipCardEditor extends LitElement {
         <div class="switch-container">
           <label class="switch-label">Hide Keypad</label>
           <ha-switch .checked="${this._config.hide_keypad === true}" .configValue="${"hide_keypad"}" @change="${this._valueChanged}"></ha-switch>
-        </div>
-
-        <div class="switch-container">
-          <label class="switch-label">Hide Video Controls</label>
-          <ha-switch .checked="${this._config.hide_video_controls === true}" .configValue="${"hide_video_controls"}" @change="${this._valueChanged}"></ha-switch>
-        </div>
-
-        <div>
-          <label class="select-label">Theme</label>
-          <ha-select
-            .value="${this._config.theme || DEFAULT_CONFIG.theme}"
-            .configValue="${"theme"}"
-            @selected="${this._valueChanged}"
-          >
-            <mwc-list-item value="auto">Auto</mwc-list-item>
-            <mwc-list-item value="light">Light</mwc-list-item>
-            <mwc-list-item value="dark">Dark</mwc-list-item>
-          </ha-select>
         </div>
 
         <h3>Contacts</h3>
@@ -148,7 +112,7 @@ export class WebRTCSipCardEditor extends LitElement {
                 @input="${this._contactChanged}"
               ></ha-textfield>
 
-              <ha-icon-button .icon="${"mdi:delete"}" .contactIndex="${index}" @click="${this._deleteContact}"></ha-icon-button>
+              <ha-icon-button .label="Delete" .contactIndex="${index}" @click="${this._deleteContact}"><ha-icon icon="mdi:delete"></ha-icon></ha-icon-button>
             </div>
           `
         )}
@@ -331,6 +295,10 @@ export class WebRTCSipCardEditor extends LitElement {
 
     ha-icon-button {
       --mdc-icon-button-size: 40px;
+      align-self: center;
+      margin-top: 16px;  /* Align with text fields */
+      color: var(--error-color, #ff0000);
+      cursor: pointer;
     }
 
     h3 {
@@ -355,13 +323,6 @@ export class WebRTCSipCardEditor extends LitElement {
       font-size: 14px;
     }
     
-    .select-label {
-      display: block;
-      margin-bottom: 4px;
-      font-weight: 500;
-      color: var(--primary-text-color);
-    }
-    
     .switch-container {
       display: flex;
       align-items: center;
@@ -371,10 +332,6 @@ export class WebRTCSipCardEditor extends LitElement {
     
     .switch-container ha-switch {
       margin-left: auto;
-    }
-    
-    ha-select {
-      width: 100%;
     }
   `;
 }

@@ -473,7 +473,7 @@ export class WebRTCSipCard extends LitElement {
         </div>
         <div class="card-title">${this.config.title || "WebRTC SIP Phone"}</div>
         ${!this.registered && !this.isRetrying
-          ? html` <ha-icon-button @click=${this.manualRetry} icon="mdi:refresh" title="Retry connection"></ha-icon-button> `
+          ? html` <ha-icon-button @click=${this.manualRetry} title="Retry connection"><ha-icon icon="mdi:refresh"></ha-icon></ha-icon-button> `
           : ""}
       </div>
     `;
@@ -552,7 +552,7 @@ export class WebRTCSipCard extends LitElement {
       <div class="manual-dial">
         <div class="dial-input-container">
           <ha-textfield .value=${this.currentInput} @input=${this.handleInputChange} placeholder="Enter number..." ?disabled=${!this.registered}></ha-textfield>
-          <ha-icon-button @click=${this.toggleKeypad} icon="mdi:dialpad" ?disabled=${!this.registered}></ha-icon-button>
+          <ha-icon-button @click=${this.toggleKeypad} ?disabled=${!this.registered}><ha-icon icon="mdi:dialpad"></ha-icon></ha-icon-button>
         </div>
         <div class="dial-actions">
           <ha-button @click=${() => this.makeVideoCall()} ?disabled=${!this.registered || !this.currentInput.trim()} class="video-call">
