@@ -1,5 +1,9 @@
 name: Continuous Integration
 
+permissions:
+  contents: write
+  actions: read
+
 on:
   push:
     branches: [main, develop]
@@ -165,3 +169,4 @@ jobs:
             dist/ha-webrtc-sip-card-editor.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
