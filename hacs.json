@@ -2,7 +2,7 @@
   "name": "WebRTC SIP Card",
   "hacs": "1.6.0",
   "render_readme": true,
-  "domains": ["frontend"],
+  "domains": ["plugin"],
   "country": ["ALL"],
   "iot_class": "Local Polling",
   "homeassistant": "2023.4.0",
