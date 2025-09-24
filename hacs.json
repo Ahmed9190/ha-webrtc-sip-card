@@ -10,5 +10,7 @@
   "zip_release": false,
   "hide_default_branch": true,
   "content_in_root": true,
-  "persistent_directory": false
+  "persistent_directory": false,
+  "documentation": "https://github.com/Ahmed9190/ha-webrtc-sip-card",
+  "issue_tracker": "https://github.com/Ahmed9190/ha-webrtc-sip-card/issues"
 }
