@@ -89,9 +89,7 @@ title: Office Phone
 server_url: wss://sip.example.com:8089/ws
 username: homeassistant
 password: yourpassword
-domain: sip.example.com
 display_name: Home Assistant Phone
-websocket_port: 8089
 use_secure: true
 contacts:
   - name: Front Door

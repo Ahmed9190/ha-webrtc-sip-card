@@ -85,7 +85,6 @@ export class WebRTCSipCard extends LitElement {
         username: this.config.username,
         password: this.config.password,
         use_secure: this.config.server_url.startsWith("wss://"),
-        display_name: this.config.display_name,
         debug: this.config.debug,
       };
 
@@ -602,7 +601,7 @@ export class WebRTCSipCard extends LitElement {
     return html`
       <div class="active-call">
         ${this.renderCallInfo()} ${this.renderVideoStatus()} ${this.renderVideoArea()} ${isIncoming ? this.renderIncomingCallControls() : ""}
-        ${isActive ? this.renderCallControls() : ""}         ${isActive ? this.renderInCallKeypad() : ""}
+        ${isActive ? this.renderCallControls() : ""} ${isActive ? this.renderInCallKeypad() : ""}
       </div>
     `;
   }
