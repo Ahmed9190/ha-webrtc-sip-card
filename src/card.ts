@@ -614,7 +614,6 @@ export class WebRTCSipCard extends LitElement {
           <div class="contact-name">${contact.name}</div>
           <div class="contact-details">
             <span class="contact-extension">${formatPhoneNumber(contact.extension)}</span>
-            <span class="video-badge">Video</span>
           </div>
         </div>
 
@@ -916,11 +915,6 @@ export class WebRTCSipCard extends LitElement {
           --primary-color: #03a9f4;
           --accent-color: #ff9800;
           --primary-text-color: #212121;
-          --secondary-text-color: #757575;
-          --disabled-text-color: #bdbdbd;
-          --primary-background-color: #f5f5f5;
-          --secondary-background-color: #e0e0e0;
-          --card-background-color: #ffffff;
           --divider-color: #e0e0e0;
           --success-color: #4caf50;
           --warning-color: #ffc107;
@@ -941,12 +935,6 @@ export class WebRTCSipCard extends LitElement {
         :host([data-theme="dark"]) {
           --primary-color: #42a5f5;
           --accent-color: #ffab40;
-          --primary-text-color: #e0e0e0;
-          --secondary-text-color: #b0b0b0;
-          --disabled-text-color: #757575;
-          --primary-background-color: #303030;
-          --secondary-background-color: #424242;
-          --card-background-color: #424242;
           --divider-color: #4a4a4a;
           --success-color: #66bb6a;
           --warning-color: #ffca28;

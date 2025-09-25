@@ -48,18 +48,6 @@ export class WebRTCSipCardEditor extends LitElement {
           .configValue="${"stun_servers"}"
           @input="${this._stunServersChanged}"
         ></ha-textfield>
-
-        <ha-select
-          label="Theme"
-          .value="${this._config.theme || "auto"}"
-          .configValue="${"theme"}"
-          @selected="${this._valueChanged}"
-        >
-          <mwc-list-item value="auto">Auto</mwc-list-item>
-          <mwc-list-item value="light">Light</mwc-list-item>
-          <mwc-list-item value="dark">Dark</mwc-list-item>
-        </ha-select>
-
         <div class="switch-container">
           <label class="switch-label">Use Secure Connection</label>
           <ha-switch .checked="${this._config.use_secure !== false}" .configValue="${"use_secure"}" @change="${this._valueChanged}"></ha-switch>
@@ -152,13 +140,13 @@ export class WebRTCSipCardEditor extends LitElement {
     if (target.tagName === "HA-SWITCH") {
       value = target.checked;
     }
-    // Handle select elements
-    else if (target.tagName === "HA-SELECT" || target.tagName === "MWC-LIST-ITEM") {
-      value = target.value || (ev as CustomEvent).detail?.value || target.selected;
-      // Handle the case where selected is an index rather than the value
-      if (typeof value === "number" && target.children && target.children[value]) {
-        value = target.children[value].value;
-      }
+    // Handle ha-select elements - use the value directly from the target for change event
+    else if (target.tagName === "HA-SELECT") {
+      value = target.value;
+    }
+    // Handle mwc-list-item selections
+    else if (target.tagName === "MWC-LIST-ITEM") {
+      value = target.value || target.selected;
     }
 
     // Type assertion to prevent TypeScript error

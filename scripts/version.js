@@ -10,6 +10,7 @@ class VersionManager {
     this.versionFile = path.join(__dirname, '../version.json');
     this.packageFile = path.join(__dirname, '../package.json');
     this.hacsFile = path.join(__dirname, '../hacs.json');
+    this.manifestFile = path.join(__dirname, '../manifest.json');
     this.constantsFile = path.join(__dirname, '../src/constants.ts');
   }
 
@@ -50,6 +51,11 @@ class VersionManager {
     const constants = fs.readFileSync(this.constantsFile, 'utf8');
     const updatedConstants = constants.replace(/(export const CARD_VERSION = ")[^"]+(")/, `$1${newVersion}$2`);
     fs.writeFileSync(this.constantsFile, updatedConstants);
+
+    // Update manifest.json
+    const manifest = JSON.parse(fs.readFileSync(this.manifestFile, 'utf8'));
+    manifest.version = newVersion;
+    fs.writeFileSync(this.manifestFile, JSON.stringify(manifest, null, 2));
 
     console.log(`Version updated to ${newVersion}`);
     return newVersion;

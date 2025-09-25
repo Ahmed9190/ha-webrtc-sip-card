@@ -1,12 +1,16 @@
 {
   "name": "WebRTC SIP Card",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "A modern WebRTC SIP client card for Home Assistant",
   "type": "module",
   "main": "ha-webrtc-sip-card.js",
   "module": "ha-webrtc-sip-card.js",
   "types": "types/ha-webrtc-sip-card.d.ts",
-  "files": ["ha-webrtc-sip-card.js", "ha-webrtc-sip-card-editor.js", "types/"],
+  "files": [
+    "ha-webrtc-sip-card.js",
+    "ha-webrtc-sip-card-editor.js",
+    "types/"
+  ],
   "exports": {
     ".": {
       "import": "./ha-webrtc-sip-card.js",
@@ -17,7 +21,17 @@
       "types": "./types/ha-webrtc-sip-card-editor.d.ts"
     }
   },
-  "keywords": ["home-assistant", "custom-card", "webrtc", "sip", "voip", "hacs", "webphone", "video-call", "phone"],
+  "keywords": [
+    "home-assistant",
+    "custom-card",
+    "webrtc",
+    "sip",
+    "voip",
+    "hacs",
+    "webphone",
+    "video-call",
+    "phone"
+  ],
   "author": "Ahmed Waleed",
   "license": "MIT",
   "repository": {
