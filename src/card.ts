@@ -654,11 +654,13 @@ export class WebRTCSipCard extends LitElement {
   private renderActiveCall(): TemplateResult {
     const isIncoming = this.callState.incoming && this.callState.status === "ringing";
     const isActive = this.callState.status === "answered";
+    // Also show controls for outgoing calls that are connecting/ringing
+    const isOutgoingRinging = this.callState.outgoing && (this.callState.status === "connecting" || this.callState.status === "ringing");
 
     return html`
       <div class="active-call">
         ${this.renderCallInfo()} ${this.renderVideoStatus()} ${this.renderVideoArea()} ${isIncoming ? this.renderIncomingCallControls() : ""}
-        ${isActive ? this.renderCallControls() : ""} ${isActive ? this.renderInCallKeypad() : ""}
+        ${(isActive || isOutgoingRinging) ? this.renderCallControls() : ""} ${isActive ? this.renderInCallKeypad() : ""}
       </div>
     `;
   }
@@ -697,8 +699,8 @@ export class WebRTCSipCard extends LitElement {
         ${!this.remoteVideoAvailable
           ? html`
               <div class="video-overlay">
-                <ha-icon icon="mdi:video-off"></ha-icon>
-                <div>No remote video</div>
+                <ha-icon style="color: var(--primary-color);" icon="mdi:video-off"></ha-icon>
+                <div style="color: var(--primary-color);">No remote video</div>
               </div>
             `
           : ""}
@@ -722,15 +724,22 @@ export class WebRTCSipCard extends LitElement {
   }
 
   private renderCallControls(): TemplateResult {
+    // For outgoing calls that are still connecting/ringing, show a cancel button instead of hangup
+    const isOutgoingConnecting = this.callState.outgoing && (this.callState.status === "connecting" || this.callState.status === "ringing");
+
     return html`
       <div class="call-controls">
         <button class="control-button ${this.callState.muted ? "danger" : "secondary"}" @click=${this.toggleMute}>
           <ha-icon icon=${this.callState.muted ? "mdi:microphone-off" : "mdi:microphone"}></ha-icon>
         </button>
 
-        <button class="control-button danger" @click=${this.hangupCall}>
-          <ha-icon icon="mdi:phone-hangup"></ha-icon>
-        </button>
+        ${isOutgoingConnecting
+          ? html`<button class="control-button danger" @click=${this.cancelCall}>
+              <ha-icon icon="mdi:phone-hangup"></ha-icon>
+            </button>`
+          : html`<button class="control-button danger" @click=${this.hangupCall}>
+              <ha-icon icon="mdi:phone-hangup"></ha-icon>
+            </button>`}
 
         <button class="control-button secondary" @click=${() => (this.showKeypad = !this.showKeypad)}>
           <ha-icon icon="mdi:dialpad"></ha-icon>
@@ -887,6 +896,18 @@ export class WebRTCSipCard extends LitElement {
       this.showKeypad = false;
     } catch (error) {
       console.error("Failed to hangup call:", error);
+    }
+  }
+
+  private async cancelCall(): Promise<void> {
+    if (!this.callManager) return;
+
+    try {
+      // For outgoing calls in "connecting" or "ringing" state, we use hangup to cancel
+      await this.callManager.hangupCall();
+      this.showKeypad = false;
+    } catch (error) {
+      console.error("Failed to cancel call:", error);
     }
   }
 

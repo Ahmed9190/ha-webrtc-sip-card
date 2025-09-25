@@ -334,6 +334,10 @@ export class CallManager extends EventTarget {
 
   // FIXED: Enhanced answerCall to properly handle video
   async answerCall(withVideo = false): Promise<void> {
+    // Stop ringtone immediately when user chooses to answer
+    this.stopRinging();
+    this.clearRingTimeout();
+
     // Prevent multiple simultaneous answer calls
     if (this.isAnsweringCall) {
       console.warn("Call is already being answered, ignoring duplicate request");
@@ -361,6 +365,7 @@ export class CallManager extends EventTarget {
   }
 
   async rejectCall(): Promise<void> {
+    // Stop ringtone immediately when user chooses to reject
     this.stopRinging();
     this.clearRingTimeout();
 

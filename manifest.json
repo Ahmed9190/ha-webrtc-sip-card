@@ -1,6 +1,6 @@
 {
   "name": "WebRTC SIP Card",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A modern WebRTC SIP client card for Home Assistant",
   "type": "module",
   "main": "ha-webrtc-sip-card.js",

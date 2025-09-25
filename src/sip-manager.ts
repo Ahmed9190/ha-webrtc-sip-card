@@ -1023,6 +1023,19 @@ export class SipManager extends EventTarget {
         this.isConnected = false;
         this.isRegistered = false;
         debugLog(this.config?.debug || false, "Server disconnected");
+        
+        // If there's an active call when server disconnects, end it properly
+        if (this.currentCall) {
+          debugLog(this.config?.debug || false, "Ending active call due to server disconnect");
+          this.currentCall.state = "ended";
+          this.dispatchEvent(
+            new CustomEvent("callEnded", {
+              detail: { callInfo: this.currentCall },
+            })
+          );
+          this.currentCall = null;
+        }
+        
         this.dispatchEvent(new CustomEvent("disconnected"));
       },
     };
@@ -1397,6 +1410,14 @@ export class SipManager extends EventTarget {
 
     const session = this.simpleUser.session;
     if (!session) {
+      // Session might have been cleared due to race condition or rapid disconnection
+      // Try to gracefully handle this by checking if we still have a pending incoming call
+      if (this.currentCall && this.currentCall.state === "incoming") {
+        // The call exists but session was cleared - it may have ended already
+        debugLog(this.config?.debug || false, "No session to answer, but call state indicates incoming call - it may have ended");
+        // Attempt to clean up the call state
+        this.currentCall = null;
+      }
       throw new Error("No session available to answer");
     }
 
