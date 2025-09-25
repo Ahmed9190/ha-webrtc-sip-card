@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ha-WebRTC-SIP-Card Theme Test</title>
+    <script type="module">
+        // Import the card
+        import "./dist/index.js";
+    </script>
+</head>
+<body>
+    <div style="max-width: 400px; margin: 20px auto; padding: 20px;">
+        <h2>Theme Test: Auto</h2>
+        <ha-webrtc-sip-card 
+            style="display: block;" 
+            data-theme="auto">
+        </ha-webrtc-sip-card>
+        
+        <h2>Theme Test: Light</h2>
+        <ha-webrtc-sip-card 
+            style="display: block;" 
+            data-theme="light">
+        </ha-webrtc-sip-card>
+        
+        <h2>Theme Test: Dark</h2>
+        <ha-webrtc-sip-card 
+            style="display: block;" 
+            data-theme="dark">
+        </ha-webrtc-sip-card>
+    </div>
+
+    <script>
+        // Simulate different themes for testing
+        document.addEventListener('DOMContentLoaded', function() {
+            // This is just for testing - in actual Home Assistant the theme would be set via config
+            console.log("Theme test page loaded");
+        });
+    </script>
+</body>
+</html>

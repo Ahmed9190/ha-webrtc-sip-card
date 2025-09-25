@@ -27,6 +27,7 @@ export interface SIPCardConfig extends LovelaceCardConfig {
   hide_video_controls?: boolean;
   ring_timeout?: number;
   debug?: boolean;
+  view_index?: number;
 }
 
 export interface TURNServer {

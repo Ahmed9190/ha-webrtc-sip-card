@@ -21,6 +21,7 @@ export class WebRTCSipCard extends LitElement {
   @state() private remoteVideoAvailable = false;
   @state() private connectionAttempts = 0;
   @state() private isRetrying = false;
+  @state() private currentTheme: "light" | "dark" = "light";
 
   @query("#remote-video") private remoteVideoElement?: HTMLVideoElement;
 
@@ -58,6 +59,7 @@ export class WebRTCSipCard extends LitElement {
       validateConfig(config);
       this.config = mergeConfig(config);
       this.connectionAttempts = 0;
+      this.updateTheme(); // Update theme when config changes
       this.initializeSipClient();
     } catch (error) {
       this.error = error instanceof Error ? error.message : "Invalid configuration";
@@ -441,8 +443,12 @@ export class WebRTCSipCard extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     if (this.config) {
+      this.updateTheme(); // Update theme when component connects
       this.initializeSipClient();
     }
+
+    // Listen for theme changes from Home Assistant
+    window.addEventListener("theme-changed", this._handleThemeChange);
   }
 
   disconnectedCallback() {
@@ -462,14 +468,66 @@ export class WebRTCSipCard extends LitElement {
     if (this.sipManager) {
       this.sipManager.disconnect().catch(console.error);
     }
+
+    // Remove theme change listener when disconnected
+    if (this.hass && this.hass.themes) {
+      window.removeEventListener("theme-changed", this._handleThemeChange);
+    }
   }
+
+  /**
+   * Determines the current theme based on configuration and system preference
+   */
+  private determineTheme(): "light" | "dark" {
+    if (this.config.theme === "light") {
+      return "light";
+    } else if (this.config.theme === "dark") {
+      return "dark";
+    } else {
+      // Auto mode: check system preference or hass theme
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (this.hass && this.hass.themes) {
+        // Check if current HA theme is dark
+        const currentTheme = this.hass.themes.default_theme || this.hass.themes.current_theme;
+        if (currentTheme && currentTheme.toLowerCase().includes("dark")) {
+          return "dark";
+        }
+      }
+      return prefersDark ? "dark" : "light";
+    }
+  }
+
+  /**
+   * Updates the theme state and applies theme-specific CSS variables
+   */
+  private updateTheme(): void {
+    const newTheme = this.determineTheme();
+    if (this.currentTheme !== newTheme) {
+      this.currentTheme = newTheme;
+      this.requestUpdate();
+    }
+  }
+
+  /**
+   * Handles theme change events from Home Assistant
+   */
+  private _handleThemeChange = (): void => {
+    this.updateTheme();
+  };
 
   protected render(): TemplateResult {
     if (!this.config) {
       return html`<ha-card><div class="error">Configuration required</div></ha-card>`;
     }
 
-    return html` <ha-card> ${this.renderStatusBar()} ${this.renderError()} ${this.renderContent()} ${this.renderIncomingCallModal()} </ha-card> `;
+    // Apply theme class to the host element
+    this.setAttribute("data-theme", this.currentTheme);
+
+    return html`
+      <ha-card class="${this.currentTheme}-theme">
+        ${this.renderStatusBar()} ${this.renderError()} ${this.renderContent()} ${this.renderIncomingCallModal()}
+      </ha-card>
+    `;
   }
 
   private renderStatusBar(): TemplateResult {
@@ -853,6 +911,58 @@ export class WebRTCSipCard extends LitElement {
     return [
       sharedStyles,
       css`
+        :host {
+          /* Default light theme variables */
+          --primary-color: #03a9f4;
+          --accent-color: #ff9800;
+          --primary-text-color: #212121;
+          --secondary-text-color: #757575;
+          --disabled-text-color: #bdbdbd;
+          --primary-background-color: #f5f5f5;
+          --secondary-background-color: #e0e0e0;
+          --card-background-color: #ffffff;
+          --divider-color: #e0e0e0;
+          --success-color: #4caf50;
+          --warning-color: #ffc107;
+          --error-color: #f44336;
+          --info-color: #2196f3;
+          --primary-color-rgb: 3, 169, 244;
+          --success-color-rgb: 76, 175, 80;
+          --error-color-rgb: 244, 67, 54;
+          --disabled-text-color-rgb: 189, 189, 189;
+          --sip-divider-color: var(--divider-color);
+          --sip-text-secondary-color: var(--secondary-text-color);
+          --sip-success-color: var(--success-color);
+          --sip-danger-color: var(--error-color);
+          --code-font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        }
+
+        /* Dark theme variables */
+        :host([data-theme="dark"]) {
+          --primary-color: #42a5f5;
+          --accent-color: #ffab40;
+          --primary-text-color: #e0e0e0;
+          --secondary-text-color: #b0b0b0;
+          --disabled-text-color: #757575;
+          --primary-background-color: #303030;
+          --secondary-background-color: #424242;
+          --card-background-color: #424242;
+          --divider-color: #4a4a4a;
+          --success-color: #66bb6a;
+          --warning-color: #ffca28;
+          --error-color: #ef5350;
+          --info-color: #42a5f5;
+          --primary-color-rgb: 66, 165, 245;
+          --success-color-rgb: 102, 187, 106;
+          --error-color-rgb: 239, 83, 80;
+          --disabled-text-color-rgb: 117, 117, 117;
+          --sip-divider-color: var(--divider-color);
+          --sip-text-secondary-color: var(--secondary-text-color);
+          --sip-success-color: var(--success-color);
+          --sip-danger-color: var(--error-color);
+          --code-font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        }
+
         .card-title {
           font-weight: 500;
           font-size: 16px;

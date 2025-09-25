@@ -44,10 +44,21 @@ export class WebRTCSipCardEditor extends LitElement {
 
         <ha-textfield
           label="STUN Servers (comma-separated)"
-          .value="${this._config.stun_servers ? this._config.stun_servers.join(",") : DEFAULT_CONFIG.stun_servers.join(",")}"
+          .value="${this._config.stun_servers ? this._config.stun_servers.join(",") : (DEFAULT_CONFIG.stun_servers || []).join(",")}"
           .configValue="${"stun_servers"}"
           @input="${this._stunServersChanged}"
         ></ha-textfield>
+
+        <ha-select
+          label="Theme"
+          .value="${this._config.theme || "auto"}"
+          .configValue="${"theme"}"
+          @selected="${this._valueChanged}"
+        >
+          <mwc-list-item value="auto">Auto</mwc-list-item>
+          <mwc-list-item value="light">Light</mwc-list-item>
+          <mwc-list-item value="dark">Dark</mwc-list-item>
+        </ha-select>
 
         <div class="switch-container">
           <label class="switch-label">Use Secure Connection</label>

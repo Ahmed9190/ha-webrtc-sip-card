@@ -1,7 +1,9 @@
 export const CARD_VERSION = "1.0.2";
 export const CARD_NAME = "ha-webrtc-sip-card";
 
-export const DEFAULT_CONFIG = {
+import type { SIPCardConfig } from "./types";
+
+export const DEFAULT_CONFIG: SIPCardConfig = {
   type: "custom:ha-webrtc-sip-card",
   title: "WebRTC SIP Phone",
   server_url: "",
@@ -15,6 +17,7 @@ export const DEFAULT_CONFIG = {
   hide_video_controls: false,
   ring_timeout: 30000,
   debug: false,
+  theme: "auto",
 };
 
 export const SIP_EVENTS = {
